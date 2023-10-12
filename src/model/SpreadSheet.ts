@@ -1,4 +1,7 @@
-class SpreadSheet {
+import { Cell } from "./Cell";
+import { User } from "./User";
+
+export class SpreadSheet {
     cells: Cell[][];
     Name: string;
     Id: number;

@@ -1,5 +1,5 @@
-
-class User {
+import { SpreadSheet } from "./SpreadSheet";
+export class User {
     ID: number;
     Name: string;
     readWrite: SpreadSheet[];

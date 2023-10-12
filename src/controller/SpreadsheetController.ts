@@ -1,4 +1,4 @@
-class SpreadsheetController {
+export class SpreadsheetController {
     processInputs(request: any): void {}
   
     createModel(inputs: any): SpreadSheet {
