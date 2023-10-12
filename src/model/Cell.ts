@@ -1,4 +1,4 @@
-class Cell {
+export class Cell {
     shownValue: any;
     hiddenValue: any;
     public Solve(hiddenValue: any, cells: Cell[][]): void {

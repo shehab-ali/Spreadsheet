@@ -1,5 +1,6 @@
+import { SpreadSheet } from "./SpreadSheet";
 
-class FileManager {
+export class FileManager {
     spreadsheets: SpreadSheet[];
   
     CreateSpreadSheet(name: string): SpreadSheet | undefined {
