@@ -3,13 +3,21 @@ import { User } from "./User";
 
 export class SpreadSheet {
     cells: Cell[][];
-    Name: string;
-    Id: number;
+    name: string;
+    id: number;
     users: User[];
+
+    constructor(cells?: Cell[][], name?: string, id?: number, users?: User[]) {
+      this.cells = cells ? cells : [];
+      this.name = name ? name : "";
+      this.id = id ? id : 0;
+      this.users = users ? users : [];
+    }
   
     SearchCells(query: string): Cell[] {
       return [];
     }
+
   
     rename(newName: string): void {}
     save(): void {}

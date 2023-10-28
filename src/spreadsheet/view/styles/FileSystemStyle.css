@@ -1,0 +1,46 @@
+.spread-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.row-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.spreadsheet-header {
+    width: 100%;
+    color:black;
+}
+
+
+.dashboard-card {
+    height: 270px;
+    width: 300px;
+    background: linear-gradient(to bottom, lightGrey 55%, white 45%);
+}
+
+.dashboard-card.active {
+    height: 270px;
+    width: 300px;
+    background: linear-gradient(to bottom, grey 55%, white 45%);
+    box-shadow: 0 0 10px 0 blue;
+}
+
+#search-form {
+    width: 50%;
+}
+
+.search-form {
+    border-radius: 30px 0px 0px 30px;
+}
+ .search-btn {
+    border-radius: 0px 30px 30px 0px;
+    cursor:pointer;
+}
+
+.hidden {
+    display: none;
+}
