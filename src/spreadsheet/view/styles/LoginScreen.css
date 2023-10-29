@@ -1,0 +1,26 @@
+.login-container {
+    background: linear-gradient(to bottom right, #3498db, #8e44ad);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-box {
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    width: 25vw;
+    height: 65vh;
+    text-align: center; 
+  }
+  
+  .input-field {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .card-header {
+    background-color:white;
+  }
