@@ -53,14 +53,49 @@ export class SpreadSheet {
       return colLabel + (row + 1);
     }
   
+    // renames the spreadsheet to newName.
+    rename(newName: string): void {
+      this.name = newName;
+    }
 
+    // deletes row from spreadsheet
+    deleteRow(rowNumber: number): void {
+      if (rowNumber >= 0 && rowNumber < this.cells.length) {
+        this.cells.splice(rowNumber, 1);
+      }
+    }
   
-    rename(newName: string): void {}
+    // deletes column from spreadsheet
+    deleteCol(colNumber: number): void {
+      if (colNumber >= 0 && colNumber < this.cells[0].length) {
+        for (let row = 0; row < this.cells.length; row++) {
+          this.cells[row].splice(colNumber, 1);
+        }
+      }
+    }
+  
+    // inserts row to spreadsheet
+    insertRow(rowNumber: number): void {
+      if (rowNumber >= 0 && rowNumber <= this.cells.length) {
+        const newRow = new Array(this.cells[0].length);
+        for (let i = 0; i < newRow.length; i++) {
+          newRow[i] = new Cell(this);
+        }
+        this.cells.splice(rowNumber, 0, newRow);
+      }
+    }
+  
+    // inserts column to spreadsheet
+    insertCol(colNumber: number): void {
+      if (colNumber >= 0 && colNumber <= this.cells[0].length) {
+        for (let row = 0; row < this.cells.length; row++) {
+          const newCell = new Cell(this);
+          this.cells[row].splice(colNumber, 0, newCell);
+        }
+      }
+    }
+    
     save(): void {}
-    deleteRow(rowNumber: number): void {}
-    deleteCol(colNumber: number): void {}
-    insertRow(rowNumber: number): void {}
-    insertCol(colNumber: number): void {}
 
 }
   
