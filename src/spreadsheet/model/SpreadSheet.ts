@@ -13,7 +13,7 @@ export class SpreadSheet {
       '*': (numbers) => numbers.reduce((a, b) => a * b, 1),
       '/': (numbers) => {
         if (numbers.length < 2 || numbers[1] === 0) {
-          return 'Error: Division by zero or invalid arguments';
+         return 99999999999999;
         }
         return numbers.reduce((a, b) => a / b);
       },
@@ -27,17 +27,11 @@ export class SpreadSheet {
       'MAX': (numbers) => Math.max(...numbers),
     };
   
-    constructor(rows: number, cols: number, name: string, id: number, users: User[]) {
-      this.cells = new Array(rows);
+    constructor(cells: Cell[][], name: string, id: number, users: User[]) {
+      this.cells = cells;
       this.name = name;
       this.id = id;
       this.users = users;
-      for (let i = 0; i < rows; i++) {
-        this.cells[i] = new Array(cols);
-        for (let j = 0; j < cols; j++) {
-          this.cells[i][j] = new Cell(this);
-        }
-      }
     }
   
     // Get a cell at a specific row and column
@@ -79,7 +73,7 @@ export class SpreadSheet {
       if (rowNumber >= 0 && rowNumber <= this.cells.length) {
         const newRow = new Array(this.cells[0].length);
         for (let i = 0; i < newRow.length; i++) {
-          newRow[i] = new Cell(this);
+          newRow[i] = new Cell();
         }
         this.cells.splice(rowNumber, 0, newRow);
       }
@@ -89,11 +83,20 @@ export class SpreadSheet {
     insertCol(colNumber: number): void {
       if (colNumber >= 0 && colNumber <= this.cells[0].length) {
         for (let row = 0; row < this.cells.length; row++) {
-          const newCell = new Cell(this);
+          const newCell = new Cell();
           this.cells[row].splice(colNumber, 0, newCell);
         }
       }
     }
+
+    getNumRows(): number {
+       return this.cells.length;
+    }
+
+    getNumCols(): number {
+      if (this.cells.length === 0) { return 0; }
+      return this.cells[0].length;
+   }
     
     save(): void {}
 

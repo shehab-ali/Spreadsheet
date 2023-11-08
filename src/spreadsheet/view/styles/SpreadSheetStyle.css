@@ -1,0 +1,36 @@
+.scrollable-container {
+    width: 80%; /* Adjust this as needed */
+    margin: 0 auto; /* Center horizontally */
+    max-height: 500px; /* Adjust this as needed */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center vertically */
+    /* border: 1px solid #ccc; */
+  }
+  
+  .grid {
+    display: grid;
+    
+  }
+  
+  .row {
+    display: grid;
+  }
+  
+  .cell {
+    width: 100px;
+    height: 40px;
+    border: 1px solid darkgrey;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .cell-bold {
+    width: 100px;
+    height: 40px;
+    border: 1px solid black!important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

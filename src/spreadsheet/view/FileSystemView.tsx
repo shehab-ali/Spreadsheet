@@ -8,11 +8,8 @@ import { FaPlus, FaTrash, FaShare, FaSearch, FaUserCircle } from 'react-icons/fa
 import InputGroup from 'react-bootstrap/InputGroup';
 import { SpreadSheetWrapper } from "../model/SpreadSheetWrapper";
 import { Modal, Button, Form } from 'react-bootstrap';
-import { is } from "@babel/types";
 import { Cell } from "../model/Cell";
 import { User } from "../model/User";
-import { write } from "fs";
-import { writeSpreadsheet } from "../db/dbFunctions";
 
 
 export class FileSystemView extends React.Component<IProps, IState> {

@@ -5,12 +5,12 @@ export class Cell {
     // Formula written by user
     private formula: string | null;
     // Spreadsheet it refers to
-    private spreadsheet: SpreadSheet;
+    // private spreadsheet: SpreadSheet;
 
-    constructor(spreadsheet: SpreadSheet, initialValue: number | string = '') {
+    constructor(initialValue: number | string  = '') {
         this.value = initialValue;
         this.formula = null;
-        this.spreadsheet = spreadsheet;
+        // this.spreadsheet = spreadsheet;
     }
 
     // Set the value of the cell
@@ -21,10 +21,12 @@ export class Cell {
 
     // Get the displayed value (could be a formula result or the raw value)
     getDisplayedValue(): number | string {
+      /*
         if (this.formula) {
             // Evaluate the formula if it exists
             return this.evaluateFormula(this.formula);
         }
+        */
         return this.value;
     }
 
@@ -33,13 +35,15 @@ export class Cell {
         this.formula = formula;
     }
 
+    /*
+
     // Evaluate a formula string
     private evaluateFormula(formula: string): number | string {
         try {
           // Split the formula by whitespace to parse individual elements
           const elements = formula.split(/\s+/);
     
-          let result = 0;
+          let result: number = 0;
           let numbers: number[] = [];
     
           for (const element of elements) {
@@ -76,23 +80,7 @@ export class Cell {
             this.formula = cellAddress;
         }
     }
-
-
-
-
-
-
-
-
-
-
-    // public Solve(hiddenValue: any, cells: Cell[][]): void {
-    //     return this.getValue();
-    // }
-    // public getValue(): any {
-    //     return this.shownValue;
-    // }
-
+    */
 
 
 }
