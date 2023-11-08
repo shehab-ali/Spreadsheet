@@ -1,36 +1,48 @@
 [
         {
             "cells": [],
+            "rows": 10,
+            "cols": 10,
             "Name": "Spreadsheet 1",
             "Id": 1,
             "users": []
         },
         {
             "cells": [],
+            "rows": 10,
+            "cols": 10,
             "Name": "Spreadsheet 2",
             "Id": 2,
             "users": []
         },
         {
             "cells": [],
+            "rows": 10,
+            "cols": 10,
             "Name": "Spreadsheet 3",
             "Id": 3,
             "users": []
         },
         {
             "cells": [],
+            "rows": 10,
+            "cols": 10,
             "Name": "Spreadsheet 4",
             "Id": 4,
             "users": []
         },
         {
             "cells": [],
+            "rows": 10,
+            "cols": 10,
             "Name": "Spreadsheet 5",
             "Id": 5,
             "users": []
         },
         {
             "cells": [],
+            "rows": 10,
+            "cols": 10,
             "Name": "Spreadsheet 6",
             "Id": 6,
             "users": []
