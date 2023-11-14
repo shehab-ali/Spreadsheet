@@ -10,7 +10,7 @@ import { Cell } from "../model/Cell";
 
 export const SpreadsheetView = () => {
     let { sheetId } = useParams();
-    const modelData = db.spreadsheets[sheetId ? parseInt(sheetId) : 0];
+    const modelData = db.spreadsheets[sheetId ? parseInt(sheetId) - 1 : 0];
     const [cells, setCells] = useState(() => {
         const initialCells = [];
         for (let i = 0; i < modelData.rows; i++) {
@@ -33,10 +33,14 @@ export const SpreadsheetView = () => {
                 for (let j = 0; j < modelData.cols; j++) {
                     row.push(
                     <div key={`${i}-${j}`} className={`${j === 0 || i === 0 ? 'cell-bold' : 'cell'} input-group-text rounded-0`}>
+                        {j == 0 && i == 0 ? "" :
+                        i === 0 ? j: 
+                        j === 0 ? String.fromCharCode("A".charCodeAt(0) - 1 + (i % 27)).toString().repeat(i/26 + 1):
                         <input type="text" className="form-control rounded-0" style={{width: "98px"}} onChange={(event) => {
                             cells[i][j].setValue(event.target.value);
                             setCells(cells);
                         }}></input>
+                    }
                     </div>
                     );
                 }
