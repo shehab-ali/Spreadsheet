@@ -35,7 +35,7 @@ export const SpreadsheetView = () => {
                     <div key={`${i}-${j}`} className={`${j === 0 || i === 0 ? 'cell-bold' : 'cell'} input-group-text rounded-0`}>
                         {j == 0 && i == 0 ? "" :
                         i === 0 ? j: 
-                        j === 0 ? String.fromCharCode("A".charCodeAt(0) - 1 + (i % 27)).toString().repeat(i/26 + 1):
+                        j === 0 ? String.fromCharCode("A".charCodeAt(0) + ((i - 1) % 26)).toString().repeat((i - 1) /26 + 1) :
                         <input type="text" className="form-control rounded-0" style={{width: "98px"}} onChange={(event) => {
                             cells[i][j].setValue(event.target.value);
                             setCells(cells);
