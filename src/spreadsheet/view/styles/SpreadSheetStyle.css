@@ -4,7 +4,6 @@
     max-height: 500px; /* Adjust this as needed */
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center vertically */
     /* border: 1px solid #ccc; */
   }
   
