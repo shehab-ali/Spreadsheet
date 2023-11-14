@@ -1,4 +1,5 @@
 import { SpreadSheet } from "./SpreadSheet";
+import { FormulaFunctions } from "./FormulaFunctions";
 export class Cell {
     // Shown value
     private value: number | string;
@@ -35,7 +36,7 @@ export class Cell {
         this.formula = formula;
     }
 
-    /*
+    
 
     // Evaluate a formula string
     private evaluateFormula(formula: string): number | string {
@@ -52,9 +53,9 @@ export class Cell {
             if (this.isNumeric(element)) {
               // If the element is a number, store it for later computation
               numbers.push(parseFloat(element));
-            } else if (element in this.spreadsheet.functions) {
+            } else if (element in FormulaFunctions) {
               // If the element is a supported function, apply it
-              result = this.spreadsheet.functions[element](numbers);
+              result = FormulaFunctions[element](numbers);
               numbers = [result];
             } else {
               return 'Error: Invalid Formula';
@@ -66,11 +67,13 @@ export class Cell {
           return 'Error: Invalid Formula';
         }
       }
+
+      
     
       private isNumeric(value: string): boolean {
         return /^-?\d*(\.\d+)?$/.test(value);
       }
-
+        /*
     // Reference another cell in this cell's formula
     referenceCell(cell: Cell): void {
         const cellAddress = this.spreadsheet.getCellAddress(cell);
