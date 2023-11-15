@@ -18,7 +18,7 @@ export class SpreadSheet {
     getCell(row: number, col: number): Cell {
       return this.cells[row][col];
     }
-  
+    
     // Get the cell's address in A1 notation (e.g., "A1", "B2")
     getCellAddress(cell: Cell): string {
       const row = this.cells.findIndex((row) => row.includes(cell));

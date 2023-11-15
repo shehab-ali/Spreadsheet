@@ -1,6 +1,6 @@
 import { SpreadSheet } from "../model/SpreadSheet";
-import '/node_modules/bootstrap/dist/css/bootstrap.min.css';
-import './styles/FileSystemStyle.css';
+// import '/node_modules/bootstrap/dist/css/bootstrap.min.css';
+// import './styles/FileSystemStyle.css';
 import db from '../db';
 import React from "react";
 import ButtonGroup from 'react-bootstrap/ButtonGroup';

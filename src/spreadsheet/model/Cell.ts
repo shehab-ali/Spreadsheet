@@ -1,5 +1,5 @@
 import { SpreadSheet } from "./SpreadSheet";
-import { FormulaFunctions } from "./FormulaFunctions";
+import { EvaluateExpression } from "./FormulaFunctions";
 export class Cell {
     // Shown value
     private value: number | string;
@@ -9,64 +9,36 @@ export class Cell {
     // private spreadsheet: SpreadSheet;
 
     constructor(initialValue: number | string  = '') {
-        this.value = initialValue;
-        this.formula = null;
-        // this.spreadsheet = spreadsheet;
+      this.value = initialValue;
+      this.formula = null;
+      // this.spreadsheet = spreadsheet;
     }
 
     // Set the value of the cell
     setValue(value: number | string): void {
-        this.value = value;
-        this.formula = null;
+      this.value = value;
+      this.formula = null;
     }
 
     // Get the displayed value (could be a formula result or the raw value)
     getDisplayedValue(): number | string {
-      /*
-        if (this.formula) {
-            // Evaluate the formula if it exists
-            return this.evaluateFormula(this.formula);
-        }
-        */
-        return this.value;
+      if (this.formula) {
+        // Evaluate the formula if it exists
+        return this.evaluateFormula(this.formula);
+      }
+      return this.value;
     }
 
     // Set a formula for the cell
     setFormula(formula: string): void {
-        this.formula = formula;
+      this.formula = formula;
     }
-
-    
 
     // Evaluate a formula string
     private evaluateFormula(formula: string): number | string {
-        try {
-          // Split the formula by whitespace to parse individual elements
-          const elements = formula.split(/\s+/);
-    
-          let result: number = 0;
-          let numbers: number[] = [];
-    
-          for (const element of elements) {
-            if (!element) continue;
-    
-            if (this.isNumeric(element)) {
-              // If the element is a number, store it for later computation
-              numbers.push(parseFloat(element));
-            } else if (element in FormulaFunctions) {
-              // If the element is a supported function, apply it
-              result = FormulaFunctions[element](numbers);
-              numbers = [result];
-            } else {
-              return 'Error: Invalid Formula';
-            }
-          }
-    
-          return result;
-        } catch (error) {
-          return 'Error: Invalid Formula';
-        }
-      }
+      const variables = { A6: 10, X7: 5 };
+      return EvaluateExpression(formula, variables)
+    }
 
       
     
