@@ -1,5 +1,6 @@
 import { Cell } from "./Cell";
 import { User } from "./User";
+import { DecodeExcelCell } from "./FormulaFunctions";
 
 export class SpreadSheet {
     name: string;
@@ -18,7 +19,7 @@ export class SpreadSheet {
     getCell(row: number, col: number): Cell {
       return this.cells[row][col];
     }
-    
+
     // Get the cell's address in A1 notation (e.g., "A1", "B2")
     getCellAddress(cell: Cell): string {
       const row = this.cells.findIndex((row) => row.includes(cell));
@@ -79,6 +80,18 @@ export class SpreadSheet {
    }
     
     save(): void {}
+
+    // Returns a map of each cell address to its displayed value. ex: { 'A6': 2, 'R3': 5}
+    getCellTOValue(): Record<string, number | string>   {
+      const values:Record<string, number> = {};
+      for (let i = 0; i < this.cells.length; i++) {
+        const row = this.cells[i];
+        for (let j = 0; j < row.length; j++) {
+          values[this.getCellAddress(row[j])] = Number(row[j].getDisplayedValue());              
+        }
+      }
+      return values;
+    }
 
 }
   

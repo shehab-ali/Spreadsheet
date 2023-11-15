@@ -1,4 +1,4 @@
-export function EvaluateExpression(expression: string, variables: Record<string, number>): number {
+export function EvaluateExpression(expression: string, variables: Record<string, number | string>): number {
   // Replace function names with their JavaScript counterparts
   expression = expression.replace(/MIN/g, 'Math.min');
   expression = expression.replace(/MAX/g, 'Math.max');
@@ -18,7 +18,7 @@ export function EvaluateExpression(expression: string, variables: Record<string,
   return result;
 }
 
-export function decodeExcelCell(cellReference: string): { row: number, column: number } {
+export function DecodeExcelCell(cellReference: string): { row: number, column: number } {
   const regex = /([A-Z]+)(\d+)/;
   const match = cellReference.match(regex);
 

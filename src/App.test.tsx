@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 import { Cell } from './spreadsheet/model/Cell';
-import { FormulaFunctions } from './spreadsheet/model/FormulaFunctions';
+// import { FormulaFunctions } from './spreadsheet/model/FormulaFunctions';
 
 describe('tests for Cell', (): void => {
 
