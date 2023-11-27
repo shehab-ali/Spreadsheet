@@ -6,27 +6,28 @@ import "./styles/FileSystemStyle.css";
 import db from "../db";
 import { useParams } from "react-router-dom";
 import { Cell } from "../model/Cell";
-import { DropdownButton, Dropdown } from "react-bootstrap";
+import { DropdownButton, Dropdown, Button } from "react-bootstrap";
 export const SpreadsheetView = () => {
   let { sheetId } = useParams();
 
   const modelData = db.spreadsheets[sheetId ? parseInt(sheetId) - 1 : 0];
 
-  const modelCells = [];
-  for (let i = 0; i < modelData.rows; i++) {
-    const row = [];
-    for (let j = 0; j < modelData.cols; j++) {
-      row.push(new Cell());
-    }
-    modelCells.push(row);
-  }
 
   const model = new SpreadSheet(
-    modelCells,
     modelData.Name,
     modelData.Id,
     modelData.users
   );
+
+  const modelCells = [];
+  for (let i = 0; i < modelData.rows; i++) {
+    const row = [];
+    for (let j = 0; j < modelData.cols; j++) {
+      row.push(new Cell('', model));
+    }
+    modelCells.push(row);
+  }
+
   const [cells, setCells] = useState<Cell[][]>(modelCells);
 
   const handleChangeCell = (
@@ -38,7 +39,7 @@ export const SpreadsheetView = () => {
       return prevCells.map((row: Cell[], i) =>
         i === rowIdx
           ? row.map((cell: Cell, j) =>
-              j === colIdx ? new Cell(event.target.value) : cell
+              j === colIdx ? new Cell(event.target.value, model) : cell
             )
           : row
       );
@@ -165,6 +166,7 @@ export const SpreadsheetView = () => {
                 onClick={(event) => handleClick(event, j - 1, i - 1)}
               ></input>
             )}
+
           </div>
         );
       }

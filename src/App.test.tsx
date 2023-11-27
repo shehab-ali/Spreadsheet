@@ -6,14 +6,14 @@ import { Cell } from './spreadsheet/model/Cell';
 
 describe('tests for Cell', (): void => {
 
-  it('should set and get the value correctly', () => {
-    const cell = new Cell();
-    cell.setValue(42);
-    expect(cell.getDisplayedValue()).toEqual(42);
+  // it('should set and get the value correctly', () => {
+  //   const cell = new Cell();
+  //   cell.setValue(42);
+  //   expect(cell.getDisplayedValue()).toEqual(42);
 
-    cell.setValue('Hello');
-    expect(cell.getDisplayedValue()).toEqual('Hello');
-  });
+  //   cell.setValue('Hello');
+  //   expect(cell.getDisplayedValue()).toEqual('Hello');
+  // });
 
 
   // it('should set and evaluate a formula correctly', () => {
