@@ -6,13 +6,19 @@ export class SpreadSheet {
   name: string;
   id: number;
   users: User[];
-  public cells: Cell[][];
+  cells: Cell[][] = [];
 
-  constructor(cells: Cell[][], name: string, id: number, users: User[]) {
-    this.cells = cells;
+  constructor(name: string, id: number, users: User[], cells?: Cell[][]) {
+    if (typeof cells !== 'undefined') {
+      this.cells = cells;
+    }
     this.name = name;
     this.id = id;
     this.users = users;
+  }
+
+  setCells(cells: Cell[][]) {
+    this.cells = cells;
   }
 
   // Get a cell at a specific row and column
@@ -54,7 +60,7 @@ export class SpreadSheet {
     if (rowNumber >= 0 && rowNumber <= this.cells.length) {
       const newRow = new Array(this.cells[0].length);
       for (let i = 0; i < newRow.length; i++) {
-        newRow[i] = new Cell();
+        newRow[i] = new Cell('', this);
       }
       this.cells.splice(rowNumber, 0, newRow);
     }
@@ -64,7 +70,7 @@ export class SpreadSheet {
   insertCol(colNumber: number): void {
     if (colNumber >= 0 && colNumber <= this.cells[0].length) {
       for (let row = 0; row < this.cells.length; row++) {
-        const newCell = new Cell();
+        const newCell = new Cell('', this);
         this.cells[row].splice(colNumber, 0, newCell);
       }
     }

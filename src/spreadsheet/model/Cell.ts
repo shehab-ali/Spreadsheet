@@ -7,12 +7,12 @@ export class Cell {
   // formula value, then the spreadsheet just calculates and shows the shown value
   private value: string | number;
   // Spreadsheet it refers to
-  // private spreadsheet: SpreadSheet;
+  private spreadsheet: SpreadSheet;
   // private references: Cell[];
 
-  constructor(initialValue: number | string = "") {
+  constructor(initialValue: number | string = "", spreadsheet: SpreadSheet) {
     this.value = initialValue;
-    // this.spreadsheet = spreadsheet;
+    this.spreadsheet = spreadsheet;
   }
 
   // Set the value of the cell, which is a formula or a raw value
@@ -25,10 +25,10 @@ export class Cell {
   getDisplayedValue(): number | string {
     // if formula exists within value, evaluate and return it
 
-    // if (this.formula) {
-    //   // Evaluate the formula if it exists
-    //   return this.evaluateFormula(this.formula);
-    // }
+    if (this.value.toString().startsWith('+')) {
+      // Evaluate the formula if it exists
+      return this.evaluateFormula(this.value.toString().slice(1));
+    }
     return this.value;
   }
 
@@ -38,10 +38,10 @@ export class Cell {
   }
 
   // Evaluate a formula string
-  // private evaluateFormula(formula: string): number | string {
-  //   const variables = this.spreadsheet.getCellTOValue();
-  //   return EvaluateExpression(formula, variables)
-  // }
+  private evaluateFormula(formula: string): number | string {
+    const variables = this.spreadsheet.getCellTOValue();
+    return EvaluateExpression(formula, variables)
+  }
 
   // private resolveReferences(formula: string): string {
   //   // Replace references in the formula with their values
