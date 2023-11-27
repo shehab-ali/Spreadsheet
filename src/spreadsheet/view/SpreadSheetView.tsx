@@ -6,7 +6,7 @@ import "./styles/FileSystemStyle.css";
 import db from "../db";
 import { useParams } from "react-router-dom";
 import { Cell } from "../model/Cell";
-
+import { DropdownButton, Dropdown } from "react-bootstrap";
 export const SpreadsheetView = () => {
   let { sheetId } = useParams();
 
@@ -185,6 +185,15 @@ export const SpreadsheetView = () => {
     <div>
       <div className="bg-light py-5 mb-5 spreadsheet-header row-container"></div>
       <div className="scrollable-container">
+        <div style={{ display: 'flex' }}>
+            {/* Add File Dropdown */}
+            <DropdownButton id="file-dropdown" title="File">
+            <Dropdown.Item>New</Dropdown.Item>
+            <Dropdown.Item>Save</Dropdown.Item>
+            <Dropdown.Item>Open</Dropdown.Item>
+            {/* Add more file-related options as needed */}
+            </DropdownButton>
+          </div>
         <input
           type="text"
           className="form-control rounded-0"
