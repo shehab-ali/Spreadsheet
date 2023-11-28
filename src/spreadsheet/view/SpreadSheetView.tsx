@@ -16,6 +16,7 @@ export const SpreadsheetView = () => {
   const navigate = useNavigate();
   const { userId } = useSelector((state: RootState) => state.loginUser);
 
+  // TODO: change to retrieve stuff from db
   // useEffect(() => {
   //   console.log(userId);
   //     if (userId === undefined || userId === null) {

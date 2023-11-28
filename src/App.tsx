@@ -13,9 +13,9 @@ import { SpreadsheetView } from "./spreadsheet/view/SpreadSheetView";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import PocketBase from "pocketbase";
+import UnauthorizedView from "./spreadsheet/view/UnathorizedView";
 
 export const pb = new PocketBase("https://spreadsheetdatabase.fly.dev");
-import UnauthorizedView from "./spreadsheet/view/UnathorizedView";
 
 function App() {
   return (
