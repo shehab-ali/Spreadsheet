@@ -1,6 +1,7 @@
 import { Component, useState, useEffect } from "react";
 import { SpreadSheet } from "../model/SpreadSheet";
 import "/node_modules/bootstrap/dist/css/bootstrap.min.css";
+import { FaSave } from 'react-icons/fa';
 import "./styles/SpreadSheetStyle.css";
 import "./styles/FileSystemStyle.css";
 import db from "../db";
@@ -55,6 +56,22 @@ export const SpreadsheetView = () => {
         i === rowIdx
           ? row.map((cell: Cell, j) =>
               j === colIdx ? new Cell(event.target.value, model) : cell
+            )
+          : row
+      );
+    });
+  };
+
+  const handleInsertFormula = (
+    forumula: string,
+    rowIdx: number,
+    colIdx: number
+  ) => {
+    setCells((prevCells: Cell[][]) => {
+      return prevCells.map((row: Cell[], i) =>
+        i === rowIdx
+          ? row.map((cell: Cell, j) =>
+              j === colIdx ? new Cell(cell.getRawValue() + forumula, model) : cell
             )
           : row
       );
@@ -204,15 +221,16 @@ export const SpreadsheetView = () => {
         <IoIosArrowBack className="back-arrow" onClick={() => navigate(-1) }/>
       </div>
       <div className="scrollable-container">
-        <div style={{ display: 'flex' }}>
-            {/* Add File Dropdown */}
-            <DropdownButton id="file-dropdown" title="File">
-            <Dropdown.Item>New</Dropdown.Item>
-            <Dropdown.Item>Save</Dropdown.Item>
-            <Dropdown.Item>Open</Dropdown.Item>
-            {/* Add more file-related options as needed */}
+        <div style={{ display: 'flex'}}>
+            <Button className="bg-success" style={{height: "38px", border: "none"}}><FaSave /></Button>
+            <DropdownButton className="mx-1" id="file-dropdown" title="Insert">
+              <Dropdown.Item onClick={() => handleInsertFormula("+SUM()", highlightedCell.row, highlightedCell.col)}>sum</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleInsertFormula("+COUNT()", highlightedCell.row, highlightedCell.col)}>count</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleInsertFormula("+AVERAGE()", highlightedCell.row, highlightedCell.col)}>average</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleInsertFormula("+MIN()", highlightedCell.row, highlightedCell.col)}>min</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleInsertFormula("+MAX()", highlightedCell.row, highlightedCell.col)}>max</Dropdown.Item>
+              <Dropdown.Item onClick={() => handleInsertFormula("+CONCAT()", highlightedCell.row, highlightedCell.col)}>concat</Dropdown.Item>
             </DropdownButton>
-          </div>
         <input
           type="text"
           className="form-control rounded-0"
@@ -221,7 +239,10 @@ export const SpreadsheetView = () => {
           onChange={(event) =>
             handleChangeCell(event, highlightedCell.row, highlightedCell.col)
           }
-        ></input>
+          >
+
+        </input>
+        </div>
         <div
           className="grid"
           style={{
