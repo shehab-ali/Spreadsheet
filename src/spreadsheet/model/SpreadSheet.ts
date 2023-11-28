@@ -5,10 +5,10 @@ import { DecodeExcelCell } from "./FormulaFunctions";
 export class SpreadSheet {
   name: string;
   id: number;
-  users: User[];
+  users: number[];
   cells: Cell[][] = [];
 
-  constructor(name: string, id: number, users: User[], cells?: Cell[][]) {
+  constructor(name: string, id: number, users: number[], cells?: Cell[][]) {
     if (typeof cells !== 'undefined') {
       this.cells = cells;
     }
