@@ -1,5 +1,6 @@
 import { EvaluateExpression, DecodeExcelCell } from './FormulaFunctions';
 import { SpreadSheet } from './SpreadSheet';
+import { Cell } from './Cell';
 
 describe('should evaluate basic arithmetic function', () => {
   it('should correctly evaluate basic arithmetic expressions', () => {
@@ -95,5 +96,33 @@ describe('DecodeExcelCell function', () => {
   });
 });
 
+describe("Cell", () => {
+  it("should detect cycles", () => {
+    const spreadsheet = new SpreadSheet("s1", 0, []);
+    const cellA = new Cell("",spreadsheet);
+    const cellB = new Cell("",spreadsheet);
+    const cellC = new Cell("",spreadsheet);
 
+    cellA.setValue("=B1");
+    cellB.setValue("=C1");
+    cellC.setValue("=A1");
+
+    const hasCycles = cellA.detectCycles();
+    expect(hasCycles).toBe(true);
+  });
+
+  it("should not detect cycles for non-cyclic references", () => {
+    const spreadsheet = new SpreadSheet("s1", 0, []);
+    const cellA = new Cell("",spreadsheet);
+    const cellB = new Cell("",spreadsheet);
+    const cellC = new Cell("",spreadsheet);
+
+    cellA.setValue("=10");
+    cellB.setValue("=C1");
+    cellC.setValue("=20");
+
+    const hasCycles = cellA.detectCycles();
+    expect(hasCycles).toBe(false);
+  });
+});
 
