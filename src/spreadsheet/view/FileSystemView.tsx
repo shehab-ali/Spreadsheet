@@ -9,8 +9,9 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { SpreadSheet } from "../model/SpreadSheet";
 import { Cell } from "../model/Cell";
 import { User } from "../model/User";
-import { AppContextType, AppContext } from "../../context";
+import type { RootState, store } from '../../redux/store';
 import db from '../db';
+import { useNavigate } from "react-router-dom";
 
 interface IProps {}
 
@@ -20,12 +21,19 @@ interface IState {
 }
 
 export const FileSystemView: React.FC<IProps> = () => {
-    const dispatch = useDispatch();
-    const userId = useSelector((state: LoginState) => state.userId);
+    const { userId } = useSelector((state: RootState) => state.loginUser)
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (userId === undefined || userId === null) {
+            navigate("/Login");
+        }
+    
+    });
     
     const [state, setState] = useState<IState>({
         spreadsheets: db.spreadsheets
-            .filter(sheet => sheet.users.includes(userId ?? 2))
+            .filter(sheet => sheet.users.includes(userId!))
             .map(sheet => new SpreadSheetWrapper(sheet.cells, sheet.Name, sheet.Id, sheet.users)),
         modalActive: false
     });
