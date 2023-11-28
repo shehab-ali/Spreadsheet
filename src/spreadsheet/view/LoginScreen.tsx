@@ -5,15 +5,14 @@ import { FaEnvelope, FaLock } from "react-icons/fa";
 import { SHA256, enc } from "crypto-js";
 import db from "../db";
 import { useNavigate } from "react-router-dom";
-import { AppContext, AppContextType } from "../../context";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../redux/login";
 
 interface IProps {}
 
 const LoginScreen: React.FC<IProps> = () => {
-  const { setLogin, navigate } = useContext(AppContext) as AppContextType;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [authenticated, setAuthenticated] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
 
@@ -34,10 +33,6 @@ const LoginScreen: React.FC<IProps> = () => {
       );
       if (user.length === 1) {
         console.log("Login Successful");
-
-        setLogin({
-          id: user[0].id,
-        });
 
         dispatch(loginUser(user[0].id));
 
