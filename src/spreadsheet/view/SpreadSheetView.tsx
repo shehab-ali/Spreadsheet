@@ -8,9 +8,22 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Cell } from "../model/Cell";
 import { DropdownButton, Dropdown, Button } from "react-bootstrap";
 import { IoIosArrowBack } from "react-icons/io";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 export const SpreadsheetView = () => {
   let { sheetId } = useParams();
   const navigate = useNavigate();
+  const { userId } = useSelector((state: RootState) => state.loginUser)
+
+    useEffect(() => {
+      console.log(userId);
+        if (userId === undefined || userId === null) {
+            navigate("/Login");
+        } else if(!db.spreadsheets[parseInt(sheetId!) - 1].users.includes(userId)) {
+            navigate("/Unauthorized");
+        }
+    
+    });
 
   const modelData = db.spreadsheets[sheetId ? parseInt(sheetId) - 1 : 0];
 
