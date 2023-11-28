@@ -13,8 +13,8 @@ export class User {
     }
   
 
-    AddReadWrite(s: SpreadSheet): void {
-        this.readWrite.push(s)
+    AddReadWrite(spreadsheet: SpreadSheet): void {
+        this.readWrite.push(spreadsheet)
     }
 
     RemoveReadWrite(spreadsheet: SpreadSheet): void {
@@ -26,8 +26,8 @@ export class User {
         }
     }
     
-    AddReadOnly(s: SpreadSheet): void {
-        this.readOnly.push(s)
+    AddReadOnly(spreadsheet: SpreadSheet): void {
+        this.readOnly.push(spreadsheet)
     }
 
     RemoveReadOnly(spreadsheet: SpreadSheet): void {
