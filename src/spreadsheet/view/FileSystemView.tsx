@@ -199,7 +199,7 @@ export const FileSystemView: React.FC<IProps> = () => {
                     {state.modalActive ? createModal() : null}
                     <div className="bg-light py-3 pl-3 spreadsheet-header row-container">
                         <h2 className="mx-4">Your Spreadsheets</h2>
-                        <h4 className="mx-4">John Doe<FaUserCircle size={40} className="mx-3" /></h4>
+                        <h4 className="mx-4">{db.users.filter(user => user.id == userId)[0].name}<FaUserCircle size={40} className="mx-3" /></h4>
                     </div>
                     <div className="row-container mx-5 my-3">
                         {createSearchBar()}
