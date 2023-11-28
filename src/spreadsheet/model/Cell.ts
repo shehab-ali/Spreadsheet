@@ -8,11 +8,12 @@ export class Cell {
   private value: string | number;
   // Spreadsheet it refers to
   private spreadsheet: SpreadSheet;
-  // private references: Cell[];
+  private references: Cell[];
 
   constructor(initialValue: number | string = "", spreadsheet: SpreadSheet) {
     this.value = initialValue;
     this.spreadsheet = spreadsheet;
+    this.references = []
   }
 
   // Set the value of the cell, which is a formula or a raw value
@@ -54,21 +55,59 @@ export class Cell {
   //   return resolvedFormula;
   // }
 
-  // getCellAddress(): string {
-  //   // need to implement
-  //   return 'A1';
-  // }
+   getCellAddress(): string {
+     // need to implement
+      return this.spreadsheet.getCellAddress(this);
+   }
 
-  // // New method to add references
-  // addReference(cell: Cell): void {
-  //   // Check for cyclic references
-  //   if (this.detectCycles(cell)) {
-  //     throw new Error('Cyclic reference detected!');
-  //   }
+   private checkCellReference(): void {
+    // First, identify all potential referenced cells and add them to the 'references' list
+    for (const row of this.spreadsheet.cells) {
+      for (const cell of row) {
+        const cellValue = cell.getCellAddress();
+  
+        if (typeof cellValue === 'string' && cellValue.includes(this.getRawValue().toString())) {
+          this.references.push(cell);
+        }
+      }
+    }
+  
+    // Perform a separate cycle detection pass
+    for (const referenceCell of this.references) {
+      if (referenceCell.detectCycles()) {
+        throw new Error("This is a cyclical reference.");
+      }
+    }
+  }
 
-  //   // Add the reference
-  //   this.references.push(cell);
-  // }
+  public detectCycles(): boolean {
+    // Create a set to track visited cells
+    const visitedCells = new Set<Cell>();
+  
+    // Call the recursive helper function to check for cycles
+    return this.detectCyclesHelper(visitedCells);
+  }
+  
+  private detectCyclesHelper(visitedCells: Set<Cell>): boolean {
+    // Check if the cell has already been visited
+    if (visitedCells.has(this)) {
+      return true; // Cycle detected
+    }
+  
+    // Add the cell to the visited cells set
+    visitedCells.add(this);
+  
+    // Check if any referenced cells have cycles
+    for (const referenceCell of this.references) {
+      if (referenceCell.detectCyclesHelper(visitedCells)) {
+        return true;
+      }
+    }
+  
+    // No cycles found
+    return false;
+  }
+   
 
   // // Helper method to detect cycles using Depth-First Search (DFS)
   // private detectCycles(targetCell: Cell, visitedCells: Set<Cell> = new Set<Cell>()): boolean {
