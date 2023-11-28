@@ -81,7 +81,7 @@ export const FileSystemView: React.FC<IProps> = () => {
             ...state,
             spreadsheets: state.spreadsheets.map((sheet) => {
                 if (sheet.id === spreadsheet.id && sheet.isSelected) {
-                    // Route here
+                    navigate(`/Spreadsheets/${spreadsheet.id}`);
                     return sheet;
                 } else if (sheet.id === spreadsheet.id) {
                     sheet.isSelected = true;

@@ -40,3 +40,14 @@
   justify-content: center;
   align-items: center;
 }
+
+.back-arrow {
+  width: 30px;
+  height: 3d0px;
+  color: black;
+  margin-left: 2%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}

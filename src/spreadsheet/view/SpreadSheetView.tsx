@@ -4,11 +4,13 @@ import "/node_modules/bootstrap/dist/css/bootstrap.min.css";
 import "./styles/SpreadSheetStyle.css";
 import "./styles/FileSystemStyle.css";
 import db from "../db";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Cell } from "../model/Cell";
 import { DropdownButton, Dropdown, Button } from "react-bootstrap";
+import { IoIosArrowBack } from "react-icons/io";
 export const SpreadsheetView = () => {
   let { sheetId } = useParams();
+  const navigate = useNavigate();
 
   const modelData = db.spreadsheets[sheetId ? parseInt(sheetId) - 1 : 0];
 
@@ -185,7 +187,9 @@ export const SpreadsheetView = () => {
 
   return (
     <div>
-      <div className="bg-light py-5 mb-5 spreadsheet-header row-container"></div>
+      <div className="bg-light py-5 mb-5 spreadsheet-header row-container">
+        <IoIosArrowBack className="back-arrow" onClick={() => navigate(-1) }/>
+      </div>
       <div className="scrollable-container">
         <div style={{ display: 'flex' }}>
             {/* Add File Dropdown */}
