@@ -39,6 +39,8 @@ export const FileSystemView: React.FC<IProps> = () => {
           .collection("spreadsheet")
           .getFullList({ requestKey: null });
 
+        console.log(spreadsheets);
+
         const spreadSheetObjects = spreadsheets.map(
           (sheet) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.users)
         );
