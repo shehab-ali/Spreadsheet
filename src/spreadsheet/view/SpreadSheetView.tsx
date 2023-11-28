@@ -1,14 +1,30 @@
 import { Component, useState, useEffect } from "react";
 import { SpreadSheet } from "../model/SpreadSheet";
 import "/node_modules/bootstrap/dist/css/bootstrap.min.css";
+import { FaSave } from "react-icons/fa";
 import "./styles/SpreadSheetStyle.css";
 import "./styles/FileSystemStyle.css";
 import db from "../db";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Cell } from "../model/Cell";
 import { DropdownButton, Dropdown, Button } from "react-bootstrap";
+import { IoIosArrowBack } from "react-icons/io";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 export const SpreadsheetView = () => {
   let { sheetId } = useParams();
+  const navigate = useNavigate();
+  const { userId } = useSelector((state: RootState) => state.loginUser);
+
+  // useEffect(() => {
+  //   console.log(userId);
+  //     if (userId === undefined || userId === null) {
+  //         navigate("/Login");
+  //     } else if(!db.spreadsheets[parseInt(sheetId!) - 1].users.includes(userId)) {
+  //         navigate("/Unauthorized");
+  //     }
+
+  // });
 
   const modelData = db.spreadsheets[sheetId ? parseInt(sheetId) - 1 : 0];
 
@@ -70,6 +86,24 @@ export const SpreadsheetView = () => {
         i === rowIdx
           ? row.map((cell: Cell, j) =>
               j === colIdx ? new Cell(event.target.value, model) : cell
+            )
+          : row
+      );
+    });
+  };
+
+  const handleInsertFormula = (
+    forumula: string,
+    rowIdx: number,
+    colIdx: number
+  ) => {
+    setCells((prevCells: Cell[][]) => {
+      return prevCells.map((row: Cell[], i) =>
+        i === rowIdx
+          ? row.map((cell: Cell, j) =>
+              j === colIdx
+                ? new Cell(cell.getRawValue() + forumula, model)
+                : cell
             )
           : row
       );
@@ -214,26 +248,97 @@ export const SpreadsheetView = () => {
 
   return (
     <div>
-      <div className="bg-light py-5 mb-5 spreadsheet-header row-container"></div>
+      <div className="bg-light py-5 mb-5 spreadsheet-header row-container">
+        <IoIosArrowBack className="back-arrow" onClick={() => navigate(-1)} />
+      </div>
       <div className="scrollable-container">
         <div style={{ display: "flex" }}>
-          {/* Add File Dropdown */}
-          <DropdownButton id="file-dropdown" title="File">
-            <Dropdown.Item>New</Dropdown.Item>
-            <Dropdown.Item>Save</Dropdown.Item>
-            <Dropdown.Item>Open</Dropdown.Item>
-            {/* Add more file-related options as needed */}
+          <Button
+            className="bg-success"
+            style={{ height: "38px", border: "none" }}
+          >
+            <FaSave />
+          </Button>
+          <DropdownButton className="mx-1" id="file-dropdown" title="Insert">
+            <Dropdown.Item
+              onClick={() =>
+                handleInsertFormula(
+                  "+SUM()",
+                  highlightedCell.row,
+                  highlightedCell.col
+                )
+              }
+            >
+              sum
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() =>
+                handleInsertFormula(
+                  "+COUNT()",
+                  highlightedCell.row,
+                  highlightedCell.col
+                )
+              }
+            >
+              count
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() =>
+                handleInsertFormula(
+                  "+AVERAGE()",
+                  highlightedCell.row,
+                  highlightedCell.col
+                )
+              }
+            >
+              average
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() =>
+                handleInsertFormula(
+                  "+MIN()",
+                  highlightedCell.row,
+                  highlightedCell.col
+                )
+              }
+            >
+              min
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() =>
+                handleInsertFormula(
+                  "+MAX()",
+                  highlightedCell.row,
+                  highlightedCell.col
+                )
+              }
+            >
+              max
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() =>
+                handleInsertFormula(
+                  "+CONCAT()",
+                  highlightedCell.row,
+                  highlightedCell.col
+                )
+              }
+            >
+              concat
+            </Dropdown.Item>
           </DropdownButton>
+          <input
+            type="text"
+            className="form-control rounded-0"
+            style={{ width: "400px", marginBottom: 10 }}
+            value={cells[highlightedCell.row][
+              highlightedCell.col
+            ].getRawValue()}
+            onChange={(event) =>
+              handleChangeCell(event, highlightedCell.row, highlightedCell.col)
+            }
+          ></input>
         </div>
-        <input
-          type="text"
-          className="form-control rounded-0"
-          style={{ width: "400px", marginBottom: 10 }}
-          value={cells[highlightedCell.row][highlightedCell.col].getRawValue()}
-          onChange={(event) =>
-            handleChangeCell(event, highlightedCell.row, highlightedCell.col)
-          }
-        ></input>
         <div
           className="grid"
           style={{
