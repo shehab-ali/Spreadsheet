@@ -4,12 +4,12 @@ import { DecodeExcelCell } from "./FormulaFunctions";
 
 export class SpreadSheet {
   name: string;
-  id: number;
+  id: string;
   users: number[];
   cells: Cell[][] = [];
 
-  constructor(name: string, id: number, users: number[], cells?: Cell[][]) {
-    if (typeof cells !== 'undefined') {
+  constructor(name: string, id: string, users: number[], cells?: Cell[][]) {
+    if (typeof cells !== "undefined") {
       this.cells = cells;
     }
     this.name = name;
@@ -60,7 +60,7 @@ export class SpreadSheet {
     if (rowNumber >= 0 && rowNumber <= this.cells.length) {
       const newRow = new Array(this.cells[0].length);
       for (let i = 0; i < newRow.length; i++) {
-        newRow[i] = new Cell('', this);
+        newRow[i] = new Cell("", this);
       }
       this.cells.splice(rowNumber, 0, newRow);
     }
@@ -70,7 +70,7 @@ export class SpreadSheet {
   insertCol(colNumber: number): void {
     if (colNumber >= 0 && colNumber <= this.cells[0].length) {
       for (let row = 0; row < this.cells.length; row++) {
-        const newCell = new Cell('', this);
+        const newCell = new Cell("", this);
         this.cells[row].splice(colNumber, 0, newCell);
       }
     }

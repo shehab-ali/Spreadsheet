@@ -12,18 +12,48 @@ export const SpreadsheetView = () => {
 
   const modelData = db.spreadsheets[sheetId ? parseInt(sheetId) - 1 : 0];
 
+  // converts a spreadsheet's cells into a string for database storage
+  // NOTE: only need to store raw values in db
+  function spreadSheetToString(listOfLists: Cell[][]): string {
+    return listOfLists
+      .map(
+        (subList) =>
+          "[" +
+          subList.map((element) => `'${element.getRawValue()}'`).join(",") +
+          "]"
+      )
+      .join("");
+  }
 
-  const model = new SpreadSheet(
-    modelData.Name,
-    modelData.Id,
-    modelData.users
-  );
+  /*
+  Going to store spreadsheet cells as a string in the database like so...
+  [["...","..."],["...","..."]]
+
+  
+
+  User
+    Id
+    username
+    password
+    spreadsheets - list of spreadsheet ids (relational)
+
+  Spreadsheet
+    Id
+    Name
+    Users
+    Rows
+    Cols
+    Cells
+  */
+
+  // TODO: change this to get the spreadsheet from db!!!
+  const model = new SpreadSheet(modelData.Name, "111", modelData.users);
 
   const modelCells = [];
   for (let i = 0; i < modelData.rows; i++) {
     const row = [];
     for (let j = 0; j < modelData.cols; j++) {
-      row.push(new Cell('', model));
+      row.push(new Cell("", model));
     }
     modelCells.push(row);
   }
@@ -166,7 +196,6 @@ export const SpreadsheetView = () => {
                 onClick={(event) => handleClick(event, j - 1, i - 1)}
               ></input>
             )}
-
           </div>
         );
       }
@@ -187,15 +216,15 @@ export const SpreadsheetView = () => {
     <div>
       <div className="bg-light py-5 mb-5 spreadsheet-header row-container"></div>
       <div className="scrollable-container">
-        <div style={{ display: 'flex' }}>
-            {/* Add File Dropdown */}
-            <DropdownButton id="file-dropdown" title="File">
+        <div style={{ display: "flex" }}>
+          {/* Add File Dropdown */}
+          <DropdownButton id="file-dropdown" title="File">
             <Dropdown.Item>New</Dropdown.Item>
             <Dropdown.Item>Save</Dropdown.Item>
             <Dropdown.Item>Open</Dropdown.Item>
             {/* Add more file-related options as needed */}
-            </DropdownButton>
-          </div>
+          </DropdownButton>
+        </div>
         <input
           type="text"
           className="form-control rounded-0"
