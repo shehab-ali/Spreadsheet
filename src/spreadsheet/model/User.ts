@@ -51,7 +51,4 @@ export class User {
 
         return permissions.length > 0 ? permissions.join('\n') : 'No permissions';
     }
-
-    }
-
-  
+}
