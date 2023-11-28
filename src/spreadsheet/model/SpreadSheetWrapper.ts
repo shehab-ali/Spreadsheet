@@ -7,7 +7,7 @@ export class SpreadSheetWrapper extends SpreadSheet {
     isSelected: boolean = false;
     isHidden: boolean = false;
 
-    constructor(cells: Cell[][], name: string, id: number, users: User[], isSelected?: boolean) {
+    constructor(cells: Cell[][], name: string, id: number, users: number[], isSelected?: boolean) {
         super(name, id, users, cells);
     }
 
