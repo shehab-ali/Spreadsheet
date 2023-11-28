@@ -38,7 +38,6 @@ export class FileManager {
       }
 
       return foundSpreadsheet;
-
     }
 
     // return a string containing the names and ids of all existing spreadsheets in the File Manager
