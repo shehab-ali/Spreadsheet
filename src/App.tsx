@@ -12,19 +12,23 @@ import {
 import { SpreadsheetView } from "./spreadsheet/view/SpreadSheetView";
 import { useContext, createContext, useState, ReactNode } from "react";
 import { AppContext, AppContextType } from "./context";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppContextProvider>
-        <Routes>
-          <Route path="/" element={<Navigate to="/Spreadsheets/2" />} />
-          <Route path="/Login" element={<LoginScreen />} />
-          <Route path="/Dashboard" element={<FileSystemView />} />
-          <Route path="/Spreadsheets/:sheetId" element={<SpreadsheetView />} />
-        </Routes>
-      </AppContextProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+          <BrowserRouter>
+          <AppContextProvider>
+            <Routes>
+              <Route path="/" element={<Navigate to="/Spreadsheets/2" />} />
+              <Route path="/Login" element={<LoginScreen />} />
+              <Route path="/Dashboard" element={<FileSystemView />} />
+              <Route path="/Spreadsheets/:sheetId" element={<SpreadsheetView />} />
+            </Routes>
+          </AppContextProvider>
+        </BrowserRouter>
+    </Provider>
   );
 }
 

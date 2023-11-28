@@ -2,7 +2,7 @@ import { SpreadSheet } from "../model/SpreadSheet";
 // import '/node_modules/bootstrap/dist/css/bootstrap.min.css';
 // import './styles/FileSystemStyle.css';
 import db from '../db';
-import React from "react";
+import React, { useContext } from "react";
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import { FaPlus, FaTrash, FaShare, FaSearch, FaUserCircle } from 'react-icons/fa';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -10,14 +10,21 @@ import { SpreadSheetWrapper } from "../model/SpreadSheetWrapper";
 import { Modal, Button, Form } from 'react-bootstrap';
 import { Cell } from "../model/Cell";
 import { User } from "../model/User";
-
+import { AppContextType, AppContext } from "../../context";
+import { useDispatch, useSelector } from "react-redux";
+import { LoginState } from "../../redux/login";
 
 export class FileSystemView extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
+        const dispatch = useDispatch();
+        const userId = useSelector((state: LoginState) => state.userId);
+
         this.state = {
-            spreadsheets: db.spreadsheets.map(sheet => new SpreadSheetWrapper(sheet.cells, sheet.Name, sheet.Id, sheet.users)),
+            spreadsheets: db.spreadsheets
+            .filter(sheet => sheet.users.includes(userId ?? 2))
+            .map(sheet => new SpreadSheetWrapper(sheet.cells, sheet.Name, sheet.Id, sheet.users)),
             modalActive: false
         };
 
@@ -168,7 +175,7 @@ export class FileSystemView extends React.Component<IProps, IState> {
                 spreadsheets: [...this.state.spreadsheets, new SpreadSheetWrapper(cells, data.get("spreadsheetTitle"), 123, [], false) as SpreadSheetWrapper]
              });
 
-             let spreadSheetDb: {cells: Cell[][], Name: string, Id: number, users: User[]}[] = db.spreadsheets
+             let spreadSheetDb: {cells: Cell[][], Name: string, Id: number, users: number[]}[] = db.spreadsheets
 
              spreadSheetDb.push({cells: cells, Name: data.get("spreadsheetTitle"), Id: 123, users: []});
 
