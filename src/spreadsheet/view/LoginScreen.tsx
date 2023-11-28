@@ -7,6 +7,7 @@ import db from "../db";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../redux/login";
+import { pb } from "../../App";
 
 interface IProps {}
 
@@ -16,30 +17,43 @@ const LoginScreen: React.FC<IProps> = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (isSigningUp) {
       // post login data to server db
       setIsSigningUp(false);
     } else {
-      const passHash = SHA256((event.target as any).password.value).toString(
-        enc.Hex
-      );
-      const user = db.users.filter(
-        (user) =>
-          user.email === (event.target as any).username.value &&
-          user.password_hash === passHash
-      );
-      if (user.length === 1) {
-        console.log("Login Successful");
+      try {
+        const authData = await pb
+          .collection("users")
+          .authWithPassword("user1", "password");
+        console.log(authData);
 
-        dispatch(loginUser(user[0].id));
-
+        dispatch(loginUser(authData.record.id));
         navigate("/Dashboard");
-      } else {
+      } catch (error) {
         console.log("Login Failed");
       }
+
+      // -----
+      // const passHash = SHA256((event.target as any).password.value).toString(
+      //   enc.Hex
+      // );
+      // const user = db.users.filter(
+      //   (user) =>
+      //     user.email === (event.target as any).username.value &&
+      //     user.password_hash === passHash
+      // );
+      // if (user.length === 1) {
+      //   console.log("Login Successful");
+
+      //   dispatch(loginUser(user[0].id));
+
+      //   navigate("/Dashboard");
+      // } else {
+      //   console.log("Login Failed");
+      // }
     }
   };
 
@@ -85,9 +99,7 @@ const LoginScreen: React.FC<IProps> = () => {
               />
               <button
                 type="button"
-                className={`link-button ${
-                  isSigningUp ? "hidden" : ""
-                }`}
+                className={`link-button ${isSigningUp ? "hidden" : ""}`}
                 onClick={() => {
                   setIsSigningUp(true);
                 }}
@@ -95,10 +107,7 @@ const LoginScreen: React.FC<IProps> = () => {
                 Sign up
               </button>
             </div>
-            <button
-              type="submit"
-              className="mt-3 btn-primary btn btn-rounded"
-            >
+            <button type="submit" className="mt-3 btn-primary btn btn-rounded">
               {isSigningUp ? "Sign Up" : "Login"}
             </button>
           </form>

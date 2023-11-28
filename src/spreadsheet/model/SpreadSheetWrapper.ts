@@ -4,18 +4,24 @@ import { User } from "./User";
 
 // Purpose of this class is to add more details for the purpose of display in the view, without changing the model.
 export class SpreadSheetWrapper extends SpreadSheet {
-    isSelected: boolean = false;
-    isHidden: boolean = false;
+  isSelected: boolean = false;
+  isHidden: boolean = false;
 
-    constructor(cells: Cell[][], name: string, id: number, users: number[], isSelected?: boolean) {
-        super(name, id, users, cells);
-    }
+  constructor(
+    name: string,
+    id: string,
+    users: number[],
+    isSelected?: boolean,
+    cells?: Cell[][]
+  ) {
+    super(name, id, users, cells);
+  }
 
-    setSelected(value: boolean): void {
-        this.isSelected = value;
-      }
+  setSelected(value: boolean): void {
+    this.isSelected = value;
+  }
 
-    setHidden(value: boolean): void {
-        this.isHidden = value;
-    }
+  setHidden(value: boolean): void {
+    this.isHidden = value;
+  }
 }
