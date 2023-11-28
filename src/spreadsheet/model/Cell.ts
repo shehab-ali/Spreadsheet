@@ -40,7 +40,7 @@ export class Cell {
   // Evaluate a formula string
   private evaluateFormula(formula: string): number | string {
     const variables = this.spreadsheet.getCellTOValue();
-    return EvaluateExpression(formula, variables)
+    return EvaluateExpression(formula, variables, this.spreadsheet.cells)
   }
 
   // private resolveReferences(formula: string): string {

@@ -1,10 +1,12 @@
-export function EvaluateExpression(expression: string, variables: Record<string, number | string>): number {
+import { Cell } from "./Cell";
+export function EvaluateExpression(expression: string, variables: Record<string, number | string>, cells: Cell[][]): number {
   // Replace function names with their JavaScript counterparts
   expression = expression.replace(/MIN/g, 'Math.min');
   expression = expression.replace(/MAX/g, 'Math.max');
   expression = expression.replace(/AVERAGE/g, 'average');
   expression = expression.replace(/COUNT/g, 'count');
   expression = expression.replace(/SUM/g, 'sum');
+  expression = expression.replace(/CONCAT\((.+?)\)/g, (_, args) => `concat(${args})`);
 
   // Replace variables with their values
   expression = expression.replace(/[A-Za-z]\w*/g, (match) => {
@@ -56,6 +58,10 @@ function count(...items: any[]): number {
 
 function sum(...numbers: number[]): number {
   return numbers.reduce((acc, num) => acc + num, 0);
+}
+
+function concat(...values: any[]): string {
+  return values.join('');
 }
 
 // Example on how it would be used
