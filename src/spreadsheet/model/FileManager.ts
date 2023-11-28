@@ -40,4 +40,10 @@ export class FileManager {
       return foundSpreadsheet;
 
     }
+
+    // return a string containing the names and ids of all existing spreadsheets in the File Manager
+    getSpreadsheetsInfo(): String {
+      const info: string[] = this.spreadsheets.map((spreadsheet) => `${spreadsheet.name} (ID: ${spreadsheet.id})`);
+       return info.join('\n');
+    }
 }
