@@ -43,8 +43,8 @@ const LoginScreen: React.FC<IProps> = () => {
         pb
           .collection("users")
           .authWithPassword((event.target as any).username.value, (event.target as any).password.value).then((res) => {
-            dispatch(switchLoading());
             dispatch(loginUser(res.record.id));
+            dispatch(switchLoading());
             navigate("/Dashboard");
           }).catch(err => {
             dispatch(switchLoading());

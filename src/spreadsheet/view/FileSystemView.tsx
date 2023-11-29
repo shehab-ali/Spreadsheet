@@ -29,6 +29,7 @@ interface IState {
 
 export const FileSystemView: React.FC<IProps> = () => {
   const { userId } = useSelector((state: RootState) => state.loginUser);
+  console.log(userId);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         // pocketbase rules do the filtering by user
         const spreadsheets = await pb
           .collection("spreadsheet")
-          .getFullList({ requestKey: null });
+          .getFullList({ expand: "users", filter: `users.id ~ '${userId}'` });
 
         console.log(spreadsheets);
 
