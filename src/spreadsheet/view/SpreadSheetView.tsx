@@ -12,6 +12,8 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { pb } from "../../App";
+import { start } from "repl";
+import { RecordModel } from "pocketbase";
 
 type ModelData = {
   model: SpreadSheet;
@@ -27,6 +29,31 @@ export const SpreadsheetView = () => {
   const [cells, setCells] = useState<Cell[][]>([]);
   const [modelData, setModelData] = useState<ModelData>();
 
+  const [countdown, setCountdown] = useState(2);
+  const [isChanging, setIsChanging] = useState(false);
+
+  const setCellsFromDb = (
+    spreadsheet: RecordModel,
+    model: SpreadSheet | null
+  ) => {
+    const cellObjs = stringToSpreadSheet(spreadsheet.cells);
+
+    const modelCells = [];
+    for (let i = 0; i < spreadsheet.rows; i++) {
+      const row = [];
+      for (let j = 0; j < spreadsheet.cols; j++) {
+        if (model) {
+          row.push(new Cell(cellObjs[i][j], model));
+        } else if (modelData) {
+          row.push(new Cell(cellObjs[i][j], modelData.model));
+        }
+      }
+      modelCells.push(row);
+    }
+
+    setCells(modelCells);
+  };
+
   useEffect(() => {
     const setSpreadSheet = async () => {
       console.log(userId);
@@ -38,8 +65,6 @@ export const SpreadsheetView = () => {
           .collection("spreadsheet")
           .getFirstListItem(`id="${sheetId}"`, { requestKey: null });
 
-        const cellObjs = stringToSpreadSheet(spreadsheet.cells);
-
         const model = new SpreadSheet(
           spreadsheet.name,
           spreadsheet.id,
@@ -50,17 +75,7 @@ export const SpreadsheetView = () => {
           rows: spreadsheet.rows,
           cols: spreadsheet.cols,
         });
-
-        const modelCells = [];
-        for (let i = 0; i < spreadsheet.rows; i++) {
-          const row = [];
-          for (let j = 0; j < spreadsheet.cols; j++) {
-            row.push(new Cell(cellObjs[i][j], model));
-          }
-          modelCells.push(row);
-        }
-
-        setCells(modelCells);
+        setCellsFromDb(spreadsheet, model);
       } catch (error) {
         console.log(error);
         navigate("/Unauthorized");
@@ -76,6 +91,45 @@ export const SpreadsheetView = () => {
     // }
   }, []);
 
+  useEffect(() => {
+    const persist = async () => {
+      if (sheetId) {
+        const cellsAsString = spreadSheetToString(cells);
+        const record = await pb
+          .collection("spreadsheet")
+          .update(sheetId, { cells: cellsAsString });
+
+        setCellsFromDb(record, null);
+      }
+    };
+
+    let interval: ReturnType<typeof setInterval> | undefined = undefined;
+
+    if (isChanging && countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown((seconds) => seconds - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      // persist changes to database and reset frontend
+      console.log("persisting");
+      persist();
+
+      setIsChanging(false);
+      setCountdown(2); // Reset the timer automatically
+    }
+
+    return () => clearInterval(interval);
+  }, [isChanging, countdown]);
+
+  const resetTimer = () => {
+    setIsChanging(false);
+    setCountdown(2);
+  };
+
+  const startTimer = () => {
+    setIsChanging(true);
+  };
+
   // converts a spreadsheet's cells into a string for database storage
   // NOTE: only need to store raw values in db
   // TODO: ensure these two methods can properly handle quotes
@@ -84,7 +138,13 @@ export const SpreadsheetView = () => {
       .map(
         (subList) =>
           "[" +
-          subList.map((element) => `'${element.getRawValue()}'`).join(",") +
+          subList
+            .map((element) => {
+              // Replace any commas in the raw value with \,
+              const rawValue = element.getRawValue().replace(/,/g, "\\,");
+              return `'${rawValue}'`;
+            })
+            .join(",") +
           "]"
       )
       .join("");
@@ -97,36 +157,18 @@ export const SpreadsheetView = () => {
     const subLists = input.split(/(?<=\])(?=\[)/);
 
     return subLists.map((subList) => {
-      // Remove the enclosing brackets and split the string by comma
-      const elements = subList.slice(1, -1).split(",");
+      // Remove the enclosing brackets
+      subList = subList.slice(1, -1);
+
+      // Split by commas not preceded by a backslash
+      const elements = subList.split(/(?<!\\),/);
 
       return elements.map((element) => {
-        // Remove the single quotes from each element and return
-        return element.slice(1, -1);
+        // Remove the single quotes and unescape any escaped commas
+        return element.slice(1, -1).replace(/\\,/g, ",");
       });
     });
   }
-
-  /*
-  Going to store spreadsheet cells as a string in the database like so...
-  [["...","..."],["...","..."]]
-
-  
-
-  User
-    Id
-    username
-    password
-    spreadsheets - list of spreadsheet ids (relational)
-
-  Spreadsheet
-    Id
-    Name
-    Users
-    Rows
-    Cols
-    Cells
-  */
 
   const handleChangeCell = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -134,6 +176,12 @@ export const SpreadsheetView = () => {
     colIdx: number
   ) => {
     if (modelData) {
+      if (isChanging) {
+        resetTimer();
+        startTimer();
+      } else {
+        startTimer();
+      }
       setCells((prevCells: Cell[][]) => {
         return prevCells.map((row: Cell[], i) =>
           i === rowIdx
@@ -306,6 +354,16 @@ export const SpreadsheetView = () => {
     }
   };
 
+  interface SaveIconProps {
+    isChanging: boolean;
+  }
+
+  const SaveIcon: React.FC<SaveIconProps> = ({ isChanging }) => {
+    const iconClass = isChanging ? "flashing" : "";
+
+    return <FaSave className={iconClass} />;
+  };
+
   return (
     <>
       {cells.length > 0 && modelData && (
@@ -322,7 +380,7 @@ export const SpreadsheetView = () => {
                 className="bg-success"
                 style={{ height: "38px", border: "none" }}
               >
-                <FaSave />
+                <SaveIcon isChanging={isChanging} />
               </Button>
               <DropdownButton
                 className="mx-1"
