@@ -29,18 +29,18 @@ interface IState {
 
 export const FileSystemView: React.FC<IProps> = () => {
   const { userId } = useSelector((state: RootState) => state.loginUser);
-  console.log(userId);
   const navigate = useNavigate();
 
   useEffect(() => {
     const getSpreadSheet = async () => {
       try {
+        console.log(userId)
+        const spreadsheets = await pb.collection("spreadsheet").getFullList({expand: "users", filter: `users ~ '${userId}'`});
         // pocketbase rules do the filtering by user
-        const spreadsheets = await pb
-          .collection("spreadsheet")
-          .getFullList({ expand: "users", filter: `users.id ~ '${userId}'` });
+        // const spreadsheets = await pb
+        //   .collection("spreadsheet")
+        //   .getFullList({ expand: "users", filter: `users.id~'${userId}'` });
 
-        console.log(spreadsheets);
 
         const spreadSheetObjects = spreadsheets.map(
           (sheet: any) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.users)
@@ -53,6 +53,7 @@ export const FileSystemView: React.FC<IProps> = () => {
           };
         });
       } catch (error) {
+        console.error(error);
         console.log("error while fetching spreadsheet");
       }
     };
@@ -127,7 +128,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         className={`card mt-3 shadow dashboard-card ${
           spreadsheet.isSelected ? "active" : ""
         } ${spreadsheet.isHidden ? "hidden" : ""}`}
-        onClick={() => navigate("/Spreadsheets/" + spreadsheet.id)}
+        onClick={() => clickSpreadsheet(spreadsheet)}
       >
         {" "}
         {spreadsheet.name}{" "}
@@ -142,7 +143,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         spreadsheets: state.spreadsheets
           .map((sheet) => {
             if (sheet.id === spreadsheet.id && sheet.isSelected) {
-              // Route here
+              navigate("/Spreadsheets/" + spreadsheet.id)
               return sheet;
             } else if (sheet.id === spreadsheet.id) {
               sheet.isSelected = true;

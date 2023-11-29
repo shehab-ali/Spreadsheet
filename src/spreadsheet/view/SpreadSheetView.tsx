@@ -65,6 +65,8 @@ export const SpreadsheetView = () => {
           .collection("spreadsheet")
           .getFirstListItem(`id="${sheetId}"`, { requestKey: null });
 
+        console.log(spreadsheet);
+
         const model = new SpreadSheet(
           spreadsheet.name,
           spreadsheet.id,
