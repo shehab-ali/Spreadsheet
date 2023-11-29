@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import "./styles/LoginScreen.css";
 import "/node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { FaEnvelope, FaLock } from "react-icons/fa";
@@ -8,13 +8,14 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../redux/login";
 import { pb } from "../../App";
+import { switchLoading } from "../../redux/loading";
+import LoadingScreen from "./LoadingScreenView";
 
 interface IProps {}
 
 const LoginScreen: React.FC<IProps> = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [authenticated, setAuthenticated] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -22,17 +23,36 @@ const LoginScreen: React.FC<IProps> = () => {
 
     if (isSigningUp) {
       // post login data to server db
+      const newUser = {
+        username: (event.target as any).name.value,
+        email: (event.target as any).username.value,
+        password: (event.target as any).password.value,
+        passwordConfirm: (event.target as any).password.value,
+      }
+      dispatch(switchLoading());
+      pb.collection("users").create(newUser).then((res) => {
+        dispatch(switchLoading());
+      }).catch(err => {
+        alert("Error signing up");
+      });
+
       setIsSigningUp(false);
     } else {
       try {
-        const authData = await pb
+        dispatch(switchLoading());
+        pb
           .collection("users")
-          .authWithPassword("user1", "password");
-        console.log(authData);
+          .authWithPassword((event.target as any).username.value, (event.target as any).password.value).then((res) => {
+            dispatch(switchLoading());
+            dispatch(loginUser(res.record.id));
+            navigate("/Dashboard");
+          }).catch(err => {
+            dispatch(switchLoading());
+            alert("Invalid Credentials, try again")
+          });
 
-        dispatch(loginUser(authData.record.id));
-        navigate("/Dashboard");
       } catch (error) {
+        console.log(error);
         console.log("Login Failed");
       }
 
@@ -58,6 +78,8 @@ const LoginScreen: React.FC<IProps> = () => {
   };
 
   return (
+    <div>
+    <LoadingScreen />
     <div className="login-container">
       <div className="card m-5 py-5 login-box">
         <div className="card-header bg-white">
@@ -113,6 +135,7 @@ const LoginScreen: React.FC<IProps> = () => {
           </form>
         </div>
       </div>
+    </div>
     </div>
   );
 };

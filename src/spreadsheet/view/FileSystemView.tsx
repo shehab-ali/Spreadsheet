@@ -42,7 +42,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         console.log(spreadsheets);
 
         const spreadSheetObjects = spreadsheets.map(
-          (sheet) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.users)
+          (sheet: any) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.users)
         );
 
         setState((prevState) => {

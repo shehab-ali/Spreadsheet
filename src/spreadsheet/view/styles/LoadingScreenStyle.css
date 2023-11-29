@@ -1,0 +1,26 @@
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px); /* Adjust the blur amount as needed */
+    z-index: 999; /* Set a high z-index to ensure it's on top */
+}
+
+.spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid grey;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
