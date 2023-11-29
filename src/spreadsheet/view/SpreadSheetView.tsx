@@ -132,7 +132,6 @@ export const SpreadsheetView = () => {
 
   // converts a spreadsheet's cells into a string for database storage
   // NOTE: only need to store raw values in db
-  // TODO: ensure these two methods can properly handle quotes
   function spreadSheetToString(listOfLists: Cell[][]): string {
     return listOfLists
       .map(
