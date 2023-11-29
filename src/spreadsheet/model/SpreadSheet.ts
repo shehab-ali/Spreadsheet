@@ -8,6 +8,7 @@ export class SpreadSheet {
   users: number[];
   cells: Cell[][] = [];
 
+  
   constructor(name: string, id: string, users: number[], cells?: Cell[][]) {
     if (typeof cells !== "undefined") {
       this.cells = cells;
