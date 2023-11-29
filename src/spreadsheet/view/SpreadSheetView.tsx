@@ -37,30 +37,12 @@ export const SpreadsheetView = () => {
     model: SpreadSheet | null
   ) => {
     const cellObjs = stringToSpreadSheet(spreadsheet.cells);
-
-    const modelCells = [];
-    for (let i = 0; i < spreadsheet.rows; i++) {
-      const row = [];
-      for (let j = 0; j < spreadsheet.cols; j++) {
-        if (model) {
-          const newCell = new Cell(cellObjs[i][j], model);
-          row.push(newCell);
-          model.cells[i][j] = newCell;
-        } else if (modelData) {
-          const newCell = new Cell(cellObjs[i][j], modelData.model);
-          row.push(newCell);
-          modelData.model.cells[i][j] = newCell;
-        }
-      }
-      modelCells.push(row);
-    }
-
-    setCells(modelCells);
+    if (model) model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, model))));
+    else if (modelData) modelData.model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, modelData.model))));
   };
 
   useEffect(() => {
     const setSpreadSheet = async () => {
-      console.log(userId);
       if (userId === undefined || userId === null) {
         navigate("/Login");
       }
@@ -69,19 +51,17 @@ export const SpreadsheetView = () => {
           .collection("spreadsheet")
           .getFirstListItem(`id="${sheetId}"`, { requestKey: null });
 
-        console.log(spreadsheet);
-
         const model = new SpreadSheet(
           spreadsheet.name,
           spreadsheet.id,
           spreadsheet.users
         );
+        setCellsFromDb(spreadsheet, model);
         setModelData({
           model: model,
           rows: spreadsheet.rows,
           cols: spreadsheet.cols,
         });
-        setCellsFromDb(spreadsheet, model);
       } catch (error) {
         console.log(error);
         navigate("/Unauthorized");
