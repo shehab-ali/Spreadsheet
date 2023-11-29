@@ -11,26 +11,74 @@ import { DropdownButton, Dropdown, Button } from "react-bootstrap";
 import { IoIosArrowBack } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { pb } from "../../App";
+
+type ModelData = {
+  model: SpreadSheet;
+  rows: number;
+  cols: number;
+};
+
 export const SpreadsheetView = () => {
   let { sheetId } = useParams();
   const navigate = useNavigate();
   const { userId } = useSelector((state: RootState) => state.loginUser);
 
-  // TODO: change to retrieve stuff from db
-  // useEffect(() => {
-  //   console.log(userId);
-  //     if (userId === undefined || userId === null) {
-  //         navigate("/Login");
-  //     } else if(!db.spreadsheets[parseInt(sheetId!) - 1].users.includes(userId)) {
-  //         navigate("/Unauthorized");
-  //     }
+  const [cells, setCells] = useState<Cell[][]>([]);
+  const [modelData, setModelData] = useState<ModelData>();
 
-  // });
+  useEffect(() => {
+    const setSpreadSheet = async () => {
+      console.log(userId);
+      if (userId === undefined || userId === null) {
+        navigate("/Login");
+      }
+      try {
+        const spreadsheet = await pb
+          .collection("spreadsheet")
+          .getFirstListItem(`id="${sheetId}"`, { requestKey: null });
 
-  const modelData = db.spreadsheets[sheetId ? parseInt(sheetId) - 1 : 0];
+        const cellObjs = stringToSpreadSheet(spreadsheet.cells);
+
+        const model = new SpreadSheet(
+          spreadsheet.name,
+          spreadsheet.id,
+          spreadsheet.users
+        );
+        setModelData({
+          model: model,
+          rows: spreadsheet.rows,
+          cols: spreadsheet.cols,
+        });
+
+        const modelCells = [];
+        for (let i = 0; i < spreadsheet.rows; i++) {
+          const row = [];
+          for (let j = 0; j < spreadsheet.cols; j++) {
+            row.push(new Cell(cellObjs[i][j], model));
+          }
+          modelCells.push(row);
+        }
+
+        setCells(modelCells);
+      } catch (error) {
+        console.log(error);
+        navigate("/Unauthorized");
+      }
+    };
+
+    setSpreadSheet();
+
+    // else if (
+    //   !db.spreadsheets[parseInt(sheetId!) - 1].users.includes(userId)
+    // ) {
+    //   navigate("/Unauthorized");
+    // }
+  }, []);
 
   // converts a spreadsheet's cells into a string for database storage
   // NOTE: only need to store raw values in db
+  // TODO: ensure these two methods can properly handle quotes
   function spreadSheetToString(listOfLists: Cell[][]): string {
     return listOfLists
       .map(
@@ -40,6 +88,23 @@ export const SpreadsheetView = () => {
           "]"
       )
       .join("");
+  }
+
+  // converts the string representation of a spreadsheet's cells back into
+  // a list of list of strings
+  function stringToSpreadSheet(input: string): string[][] {
+    // Split the input into sublists using a regex that matches the '[]' brackets
+    const subLists = input.split(/(?<=\])(?=\[)/);
+
+    return subLists.map((subList) => {
+      // Remove the enclosing brackets and split the string by comma
+      const elements = subList.slice(1, -1).split(",");
+
+      return elements.map((element) => {
+        // Remove the single quotes from each element and return
+        return element.slice(1, -1);
+      });
+    });
   }
 
   /*
@@ -63,34 +128,24 @@ export const SpreadsheetView = () => {
     Cells
   */
 
-  // TODO: change this to get the spreadsheet from db!!!
-  const model = new SpreadSheet(modelData.Name, "111", modelData.users);
-
-  const modelCells = [];
-  for (let i = 0; i < modelData.rows; i++) {
-    const row = [];
-    for (let j = 0; j < modelData.cols; j++) {
-      row.push(new Cell("", model));
-    }
-    modelCells.push(row);
-  }
-
-  const [cells, setCells] = useState<Cell[][]>(modelCells);
-
   const handleChangeCell = (
     event: React.ChangeEvent<HTMLInputElement>,
     rowIdx: number,
     colIdx: number
   ) => {
-    setCells((prevCells: Cell[][]) => {
-      return prevCells.map((row: Cell[], i) =>
-        i === rowIdx
-          ? row.map((cell: Cell, j) =>
-              j === colIdx ? new Cell(event.target.value, model) : cell
-            )
-          : row
-      );
-    });
+    if (modelData) {
+      setCells((prevCells: Cell[][]) => {
+        return prevCells.map((row: Cell[], i) =>
+          i === rowIdx
+            ? row.map((cell: Cell, j) =>
+                j === colIdx
+                  ? new Cell(event.target.value, modelData.model)
+                  : cell
+              )
+            : row
+        );
+      });
+    }
   };
 
   const handleInsertFormula = (
@@ -98,17 +153,19 @@ export const SpreadsheetView = () => {
     rowIdx: number,
     colIdx: number
   ) => {
-    setCells((prevCells: Cell[][]) => {
-      return prevCells.map((row: Cell[], i) =>
-        i === rowIdx
-          ? row.map((cell: Cell, j) =>
-              j === colIdx
-                ? new Cell(cell.getRawValue() + forumula, model)
-                : cell
-            )
-          : row
-      );
-    });
+    if (modelData) {
+      setCells((prevCells: Cell[][]) => {
+        return prevCells.map((row: Cell[], i) =>
+          i === rowIdx
+            ? row.map((cell: Cell, j) =>
+                j === colIdx
+                  ? new Cell(cell.getRawValue() + forumula, modelData.model)
+                  : cell
+              )
+            : row
+        );
+      });
+    }
   };
 
   const handleDoubleClick = (
@@ -182,173 +239,190 @@ export const SpreadsheetView = () => {
   */
 
   const generateGrid = () => {
-    const grid = [];
+    if (modelData) {
+      const grid = [];
 
-    for (let i = 0; i < modelData.rows + 1; i++) {
-      const row = [];
-      for (let j = 0; j < modelData.cols + 1; j++) {
-        row.push(
+      for (let i = 0; i < modelData.rows + 1; i++) {
+        const row = [];
+        for (let j = 0; j < modelData.cols + 1; j++) {
+          row.push(
+            <div
+              key={`${i}-${j}`}
+              className={`${
+                j === 0 || i === 0 ? "cell-bold" : "cell"
+              } input-group-text rounded-0`}
+            >
+              {j == 0 && i == 0 ? (
+                ""
+              ) : i === 0 ? (
+                j
+              ) : j === 0 ? (
+                String.fromCharCode("A".charCodeAt(0) + ((i - 1) % 26))
+                  .toString()
+                  .repeat((i - 1) / 26 + 1)
+              ) : (
+                <input
+                  type="text"
+                  className={`form-control rounded-0 ${
+                    j - 1 === highlightedCell["row"] &&
+                    i - 1 === highlightedCell["col"]
+                      ? "highlighted-cell"
+                      : ""
+                  }`}
+                  style={{ width: "98px" }}
+                  onDoubleClick={(event) =>
+                    handleDoubleClick(event, j - 1, i - 1)
+                  }
+                  onBlur={() =>
+                    setHighlightedCell((prevState) => {
+                      return { ...prevState, focused: false };
+                    })
+                  }
+                  value={
+                    highlightedCell.focused &&
+                    highlightedCell.row === j - 1 &&
+                    highlightedCell.col === i - 1
+                      ? cells[j - 1][i - 1].getRawValue()
+                      : cells[j - 1][i - 1].getDisplayedValue()
+                  }
+                  onChange={(event) => handleChangeCell(event, j - 1, i - 1)}
+                  onClick={(event) => handleClick(event, j - 1, i - 1)}
+                ></input>
+              )}
+            </div>
+          );
+        }
+        grid.push(
           <div
-            key={`${i}-${j}`}
-            className={`${
-              j === 0 || i === 0 ? "cell-bold" : "cell"
-            } input-group-text rounded-0`}
+            key={i}
+            className="row"
+            style={{ gridTemplateRows: `repeat(${modelData.rows + 1}, 40px)` }}
           >
-            {j == 0 && i == 0 ? (
-              ""
-            ) : i === 0 ? (
-              j
-            ) : j === 0 ? (
-              String.fromCharCode("A".charCodeAt(0) + ((i - 1) % 26))
-                .toString()
-                .repeat((i - 1) / 26 + 1)
-            ) : (
-              <input
-                type="text"
-                className={`form-control rounded-0 ${
-                  j - 1 === highlightedCell["row"] &&
-                  i - 1 === highlightedCell["col"]
-                    ? "highlighted-cell"
-                    : ""
-                }`}
-                style={{ width: "98px" }}
-                onDoubleClick={(event) =>
-                  handleDoubleClick(event, j - 1, i - 1)
-                }
-                onBlur={() =>
-                  setHighlightedCell((prevState) => {
-                    return { ...prevState, focused: false };
-                  })
-                }
-                value={
-                  highlightedCell.focused &&
-                  highlightedCell.row === j - 1 &&
-                  highlightedCell.col === i - 1
-                    ? cells[j - 1][i - 1].getRawValue()
-                    : cells[j - 1][i - 1].getDisplayedValue()
-                }
-                onChange={(event) => handleChangeCell(event, j - 1, i - 1)}
-                onClick={(event) => handleClick(event, j - 1, i - 1)}
-              ></input>
-            )}
+            {row}
           </div>
         );
       }
-      grid.push(
-        <div
-          key={i}
-          className="row"
-          style={{ gridTemplateRows: `repeat(${modelData.rows + 1}, 40px)` }}
-        >
-          {row}
-        </div>
-      );
+      return grid;
     }
-    return grid;
   };
 
   return (
-    <div>
-      <div className="bg-light py-5 mb-5 spreadsheet-header row-container">
-        <IoIosArrowBack className="back-arrow" onClick={() => navigate(-1)} />
-      </div>
-      <div className="scrollable-container">
-        <div style={{ display: "flex" }}>
-          <Button
-            className="bg-success"
-            style={{ height: "38px", border: "none" }}
-          >
-            <FaSave />
-          </Button>
-          <DropdownButton className="mx-1" id="file-dropdown" title="Insert">
-            <Dropdown.Item
-              onClick={() =>
-                handleInsertFormula(
-                  "+SUM()",
-                  highlightedCell.row,
+    <>
+      {cells.length > 0 && modelData && (
+        <div>
+          <div className="bg-light py-5 mb-5 spreadsheet-header row-container">
+            <IoIosArrowBack
+              className="back-arrow"
+              onClick={() => navigate(-1)}
+            />
+          </div>
+          <div className="scrollable-container">
+            <div style={{ display: "flex" }}>
+              <Button
+                className="bg-success"
+                style={{ height: "38px", border: "none" }}
+              >
+                <FaSave />
+              </Button>
+              <DropdownButton
+                className="mx-1"
+                id="file-dropdown"
+                title="Insert"
+              >
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
+                      "+SUM()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  sum
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
+                      "+COUNT()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  count
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
+                      "+AVERAGE()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  average
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
+                      "+MIN()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  min
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
+                      "+MAX()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  max
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
+                      "+CONCAT()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  concat
+                </Dropdown.Item>
+              </DropdownButton>
+              <input
+                type="text"
+                className="form-control rounded-0"
+                style={{ width: "400px", marginBottom: 10 }}
+                value={cells[highlightedCell.row][
                   highlightedCell.col
-                )
-              }
+                ].getRawValue()}
+                onChange={(event) =>
+                  handleChangeCell(
+                    event,
+                    highlightedCell.row,
+                    highlightedCell.col
+                  )
+                }
+              ></input>
+            </div>
+            <div
+              className="grid"
+              style={{
+                gridTemplateColumns: `repeat(${modelData.cols + 1}, 100px)`,
+              }}
             >
-              sum
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() =>
-                handleInsertFormula(
-                  "+COUNT()",
-                  highlightedCell.row,
-                  highlightedCell.col
-                )
-              }
-            >
-              count
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() =>
-                handleInsertFormula(
-                  "+AVERAGE()",
-                  highlightedCell.row,
-                  highlightedCell.col
-                )
-              }
-            >
-              average
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() =>
-                handleInsertFormula(
-                  "+MIN()",
-                  highlightedCell.row,
-                  highlightedCell.col
-                )
-              }
-            >
-              min
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() =>
-                handleInsertFormula(
-                  "+MAX()",
-                  highlightedCell.row,
-                  highlightedCell.col
-                )
-              }
-            >
-              max
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() =>
-                handleInsertFormula(
-                  "+CONCAT()",
-                  highlightedCell.row,
-                  highlightedCell.col
-                )
-              }
-            >
-              concat
-            </Dropdown.Item>
-          </DropdownButton>
-          <input
-            type="text"
-            className="form-control rounded-0"
-            style={{ width: "400px", marginBottom: 10 }}
-            value={cells[highlightedCell.row][
-              highlightedCell.col
-            ].getRawValue()}
-            onChange={(event) =>
-              handleChangeCell(event, highlightedCell.row, highlightedCell.col)
-            }
-          ></input>
+              {generateGrid()}
+            </div>
+          </div>
         </div>
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: `repeat(${modelData.cols + 1}, 100px)`,
-          }}
-        >
-          {generateGrid()}
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
