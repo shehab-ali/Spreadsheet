@@ -1,4 +1,5 @@
 import { SpreadSheet } from "./SpreadSheet";
+import { pb } from "../../App";
 
 export class FileManager {
   spreadsheets: SpreadSheet[];
