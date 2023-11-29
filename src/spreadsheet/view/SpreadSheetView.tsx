@@ -37,10 +37,15 @@ export const SpreadsheetView = () => {
     model: SpreadSheet | null
   ) => {
     const cellObjs = stringToSpreadSheet(spreadsheet.cells);
-    if (model) model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, model))));
-    else if (modelData) modelData.model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, modelData.model))));
+    if (model) {
+      model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, model))));
+      setCells(model.cells);
+    }
+    else if (modelData) {
+      modelData.model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, modelData.model))));
+      setCells(modelData.model.cells);
+    } 
 
-    setCells(modelData!.model.cells);
   };
 
   useEffect(() => {
