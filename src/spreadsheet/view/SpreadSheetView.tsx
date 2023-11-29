@@ -39,6 +39,8 @@ export const SpreadsheetView = () => {
     const cellObjs = stringToSpreadSheet(spreadsheet.cells);
     if (model) model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, model))));
     else if (modelData) modelData.model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, modelData.model))));
+
+    setCells(modelData!.model.cells);
   };
 
   useEffect(() => {
@@ -56,12 +58,12 @@ export const SpreadsheetView = () => {
           spreadsheet.id,
           spreadsheet.users
         );
-        setCellsFromDb(spreadsheet, model);
         setModelData({
           model: model,
           rows: spreadsheet.rows,
           cols: spreadsheet.cols,
         });
+        setCellsFromDb(spreadsheet, model);
       } catch (error) {
         console.log(error);
         navigate("/Unauthorized");
