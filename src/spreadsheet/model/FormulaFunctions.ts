@@ -1,12 +1,19 @@
 import { Cell } from "./Cell";
-export function EvaluateExpression(expression: string, variables: Record<string, number | string>, cells: Cell[][]): number {
+export function EvaluateExpression(
+  expression: string,
+  variables: Record<string, number | string>,
+  cells: Cell[][]
+): string {
   // Replace function names with their JavaScript counterparts
-  expression = expression.replace(/MIN/g, 'Math.min');
-  expression = expression.replace(/MAX/g, 'Math.max');
-  expression = expression.replace(/AVERAGE/g, 'average');
-  expression = expression.replace(/COUNT/g, 'count');
-  expression = expression.replace(/SUM/g, 'sum');
-  expression = expression.replace(/CONCAT\((.+?)\)/g, (_, args) => `concat(${args})`);
+  expression = expression.replace(/MIN/g, "Math.min");
+  expression = expression.replace(/MAX/g, "Math.max");
+  expression = expression.replace(/AVERAGE/g, "average");
+  expression = expression.replace(/COUNT/g, "count");
+  expression = expression.replace(/SUM/g, "sum");
+  expression = expression.replace(
+    /CONCAT\((.+?)\)/g,
+    (_, args) => `concat(${args})`
+  );
 
   // Replace variables with their values
   expression = expression.replace(/[A-Za-z]\w*/g, (match) => {
@@ -17,15 +24,18 @@ export function EvaluateExpression(expression: string, variables: Record<string,
   // Evaluate the expression
   const result = eval(expression);
 
-  return result;
+  return String(result);
 }
 
-export function DecodeExcelCell(cellReference: string): { row: number, column: number } {
+export function DecodeExcelCell(cellReference: string): {
+  row: number;
+  column: number;
+} {
   const regex = /([A-Z]+)(\d+)/;
   const match = cellReference.match(regex);
 
   if (!match) {
-      throw new Error("Invalid cell reference format");
+    throw new Error("Invalid cell reference format");
   }
 
   const columnString = match[1];
@@ -34,8 +44,8 @@ export function DecodeExcelCell(cellReference: string): { row: number, column: n
   // Convert column letters to column number
   let column = 0;
   for (let i = 0; i < columnString.length; i++) {
-      const charCode = columnString.charCodeAt(i) - 'A'.charCodeAt(0) + 1;
-      column = column * 26 + charCode;
+    const charCode = columnString.charCodeAt(i) - "A".charCodeAt(0) + 1;
+    column = column * 26 + charCode;
   }
 
   const row = parseInt(rowString, 10);
@@ -61,7 +71,7 @@ function sum(...numbers: number[]): number {
 }
 
 function concat(...values: any[]): string {
-  return values.join('');
+  return values.join("");
 }
 
 // Example on how it would be used
