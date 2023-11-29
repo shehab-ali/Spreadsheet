@@ -126,7 +126,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         className={`card mt-3 shadow dashboard-card ${
           spreadsheet.isSelected ? "active" : ""
         } ${spreadsheet.isHidden ? "hidden" : ""}`}
-        onClick={() => clickSpreadsheet(spreadsheet)}
+        onClick={() => navigate("/Spreadsheets/" + spreadsheet.id)}
       >
         {" "}
         {spreadsheet.name}{" "}
