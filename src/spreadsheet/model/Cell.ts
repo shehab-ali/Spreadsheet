@@ -59,13 +59,16 @@ export class Cell {
     // need to implement
     return this.spreadsheet.getCellAddress(this);
   }
-
-  private checkCellReference(): void {
+  /*
+  
+  public checkCellReference(): boolean {
     // First, identify all potential referenced cells and add them to the 'references' list
-    for (const row of this.spreadsheet.cells) {
-      for (const cell of row) {
-        const cellValue = cell.getCellAddress();
-
+    for (let i = 0; i < this.spreadsheet.cells.length; i++) {
+      const row = this.spreadsheet.cells[i];
+      for (let j = 0; j < row.length; j++) {
+        const cell = row[j];
+        const cellValue = String.fromCharCode('A'.charCodeAt(0) + j) + (i + 1);
+    
         if (
           typeof cellValue === "string" &&
           cellValue.includes(this.getRawValue().toString())
@@ -78,12 +81,14 @@ export class Cell {
     // Perform a separate cycle detection pass
     for (const referenceCell of this.references) {
       if (referenceCell.detectCycles()) {
-        throw new Error("This is a cyclical reference.");
+        //throw new Error("This is a cyclical reference.");
+        return false;
       }
     }
+    return true;
   }
-
-  public detectCycles(): boolean {
+  
+  private detectCycles(): boolean {
     // Create a set to track visited cells
     const visitedCells = new Set<Cell>();
 
@@ -106,11 +111,10 @@ export class Cell {
         return true;
       }
     }
-
     // No cycles found
     return false;
   }
-
+  */
   // // Helper method to detect cycles using Depth-First Search (DFS)
   // private detectCycles(targetCell: Cell, visitedCells: Set<Cell> = new Set<Cell>()): boolean {
   //   if (visitedCells.has(this)) {
