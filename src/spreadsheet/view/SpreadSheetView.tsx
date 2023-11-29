@@ -43,9 +43,13 @@ export const SpreadsheetView = () => {
       const row = [];
       for (let j = 0; j < spreadsheet.cols; j++) {
         if (model) {
-          row.push(new Cell(cellObjs[i][j], model));
+          const newCell = new Cell(cellObjs[i][j], model);
+          row.push(newCell);
+          model.cells[i][j] = newCell;
         } else if (modelData) {
-          row.push(new Cell(cellObjs[i][j], modelData.model));
+          const newCell = new Cell(cellObjs[i][j], modelData.model);
+          row.push(newCell);
+          modelData.model.cells[i][j] = newCell;
         }
       }
       modelCells.push(row);
@@ -186,7 +190,11 @@ export const SpreadsheetView = () => {
           i === rowIdx
             ? row.map((cell: Cell, j) =>
                 j === colIdx
-                  ? new Cell(event.target.value, modelData.model)
+                  ? (() => {
+                    const updatedCell = new Cell(event.target.value, modelData.model);
+                    modelData.model.cells[rowIdx][colIdx] = updatedCell;
+                    return updatedCell;
+                  })()
                   : cell
               )
             : row
@@ -206,8 +214,12 @@ export const SpreadsheetView = () => {
           i === rowIdx
             ? row.map((cell: Cell, j) =>
                 j === colIdx
-                  ? new Cell(cell.getRawValue() + forumula, modelData.model)
-                  : cell
+                ? (() => {
+                  const updatedCell = new Cell(cell.getRawValue() + forumula, modelData.model)
+                  modelData.model.cells[rowIdx][colIdx] = updatedCell;
+                  return updatedCell;
+                })()
+                : cell
               )
             : row
         );

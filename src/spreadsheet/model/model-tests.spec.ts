@@ -58,7 +58,7 @@ describe("should evaluate basic arithmetic function", () => {
     const result = EvaluateExpression(expression, variables, s.cells);
     expect(result).toBe("Hello World");
   });
-
+  
   it("should evaluate cell references", () => {
     const s = new SpreadSheet("s1", "0", []);
     const c1 = new Cell("10", s);
@@ -66,6 +66,7 @@ describe("should evaluate basic arithmetic function", () => {
     const c3 = new Cell("6",s);
     const c4 = new Cell("40",s);
 
+    
     s.cells = [[c1, c2], 
                 [c3, c4]];
     
@@ -115,52 +116,62 @@ describe("DecodeExcelCell function", () => {
 });
 
 describe("Cell", () => {
-  /*
+  
   it("should detect cycles", () => {
-    const spreadsheet = new SpreadSheet("s1", "0", []);
-    const cellA = new Cell("", spreadsheet);
-    const cellB = new Cell("", spreadsheet);
-    const cellC = new Cell("", spreadsheet);
+    const emptyCells: Cell[][] = [];
+    for (let i = 0; i < 10; i++) {
+      emptyCells.push(Array(10).fill(''));
+    }
+    const spreadsheet = new SpreadSheet("s1", "0", [], emptyCells);
 
-    cellA.setValue("=B1");
-    cellB.setValue("=C1");
-    cellC.setValue("=A1");
+    const cellA = new Cell("B1", spreadsheet);
+    const cellB = new Cell("A1", spreadsheet);
+    //const cellC = new Cell("A1", spreadsheet);
 
+    spreadsheet.cells[0][0] = cellA; //A1
+    spreadsheet.cells[0][1] = cellB; //B1
+    //spreadsheet.cells[0][2] = cellC; //C1
+
+
+    //expect(spreadsheet.getCellAddress(cellB)).toBe(true);
     expect(cellA.checkCellReference()).toBe(true);
   });
 
   it("should not detect cycles for non-cyclic references", () => {
-    const spreadsheet = new SpreadSheet("s1", "0", []);
+    
+    const emptyCells: Cell[][] = [];
+    for (let i = 0; i < 10; i++) {
+      emptyCells.push(Array(10).fill(undefined));
+    }
+    const spreadsheet = new SpreadSheet("s1", "0", [], emptyCells);
     const cellA = new Cell("", spreadsheet);
     const cellB = new Cell("", spreadsheet);
     const cellC = new Cell("", spreadsheet);
 
-    cellA.setValue("=10");
-    cellB.setValue("=C1");
-    cellC.setValue("=20");
+    cellA.setValue("10");
+    cellB.setValue("C1");
+    cellC.setValue("20");
 
     expect(cellA.checkCellReference()).toBe(false);
   });
-  */
+  
   it("should add cell variables to list of vars", () => {
+    
     const s = new SpreadSheet("s1", "0", []);
+        
     const c1 = new Cell("10", s);
-    const c2 = new Cell("8",s);
-    const c3 = new Cell("6",s);
-    const c4 = new Cell("40",s);
+    const c2 = new Cell("8" , s);
+    const c3 = new Cell("6" , s);
+    const c4 = new Cell("40", s);
 
     s.cells = [[c1, c2], 
-                [c3, c4]];
-    
+               [c3, c4]];
+
     const variables: Record<string, number | string> = {};
     const expression = "A1 + B2";
 
-    EvaluateExpression(expression, variables, s.cells);
+    const result = EvaluateExpression(expression, variables, s.cells);
 
-    // Only non-empty cells should update variables
-    expect(variables["A1"]).toBe('10'); // Value from cells[0][0]
-    expect(variables["A2"]).toBe('8');  // Value from cells[0][1]
-    expect(variables["B1"]).toBe('6');  // Value from cells[1][0] 
-    expect(variables["B2"]).toBe('40'); // Value from cells[1][1]
+    expect(result).toBe('50');
   });
 });

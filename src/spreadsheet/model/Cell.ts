@@ -14,6 +14,7 @@ export class Cell {
     this.value = initialValue;
     this.spreadsheet = spreadsheet;
     this.references = [];
+        
   }
 
   // Set the value of the cell, which is a formula or a raw value
@@ -59,8 +60,32 @@ export class Cell {
     // need to implement
     return this.spreadsheet.getCellAddress(this);
   }
-  /*
   
+
+  public checkCellReference(): boolean {
+    const visitedCells = new Set<Cell>(); // Track visited cells
+    return this.detectCycles(visitedCells); // Start cycle detection
+  }
+  
+  private detectCycles(visitedCells: Set<Cell>): boolean {
+    if (visitedCells.has(this)) {
+      return true; // Cycle detected
+    }
+  
+    visitedCells.add(this);
+  
+    // Check each referenced cell for cycles
+    for (const referenceCell of this.references) {
+      if (referenceCell.detectCycles(visitedCells)) {
+        return true;
+      }
+    }
+  
+    visitedCells.delete(this); // Remove cell from visited cells
+    return false; // No cycles found
+  }
+  
+  /*
   public checkCellReference(): boolean {
     // First, identify all potential referenced cells and add them to the 'references' list
     for (let i = 0; i < this.spreadsheet.cells.length; i++) {
@@ -115,6 +140,7 @@ export class Cell {
     return false;
   }
   */
+  
   // // Helper method to detect cycles using Depth-First Search (DFS)
   // private detectCycles(targetCell: Cell, visitedCells: Set<Cell> = new Set<Cell>()): boolean {
   //   if (visitedCells.has(this)) {
