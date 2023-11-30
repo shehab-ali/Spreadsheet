@@ -10,8 +10,8 @@ export class FileManager {
 
   // check init condition of users
   // Creates a new spreadsheet and adds it to the FileManager's spreadsheets list.
-  CreateSpreadSheet(name: string, id: string): SpreadSheet | undefined {
-    const s = new SpreadSheet(name, id, []);
+  CreateSpreadSheet(name: string, id: string, rows: number, cols: number): SpreadSheet | undefined {
+    const s = new SpreadSheet(name, id, [], rows, cols);
     this.spreadsheets.push(s);
     return s;
   }
