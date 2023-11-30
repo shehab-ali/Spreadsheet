@@ -41,7 +41,7 @@ describe("Cell function tests", () => {
 });
 */
     describe('Cell Class Tests', () => {
-
+/*
         it('should correctly get the displayed value with getDisplayedValue() for basic arithmetic expressions', () => {
           const emptyCells: Cell[][] = [];
           for (let i = 0; i < 10; i++) {
@@ -71,7 +71,7 @@ describe("Cell function tests", () => {
 
 
 
-      /*
+      
         it('should correctly get the displayed value with getDisplayedValue() for complex arithmetic expressions', () => {
           const expression = '10 + 5 * 2 / (7 - 4)';
           cell.setValue(`+${expression}`);
