@@ -426,7 +426,7 @@ export const SpreadsheetView = () => {
                       );
                     });
                   }}
-                  value={cells[j - 1][i - 1]}
+                  value={cells[i - 1][j - 1]}
                   onChange={(event) => handleChangeCell(event, j - 1, i - 1)}
                   onClick={(event) => handleClick(event, j - 1, i - 1)}
                 ></input>

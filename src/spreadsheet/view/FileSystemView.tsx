@@ -267,7 +267,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         users: [userId],
         rows: data.get("numRows"),
         cols: data.get("numCols"),
-        cells : Array.from({ length: parseInt(data.get("numRows")) }, () => `[${Array(parseInt(data.get("numCols"))).fill('\'\'').join(', ')}]`).join(',')
+        cells : Array.from({ length: parseInt(data.get("numRows")) }, () => `[${Array(parseInt(data.get("numCols"))).fill('\'\'').join(',')}]`).join('')
       };
 
       try {
