@@ -357,3 +357,22 @@ describe("should return raw value and toggle error flg if invalid", () => {
  
 
 });
+
+
+describe("change back to priv", () => {
+  it("should throw error flag for function type errors", () => {
+    const s = new SpreadSheet("s1", "0", [], 5, 5);
+    const {row,column} = s.decodeExcelCell('A2');
+    expect(row).toBe(1);
+    expect(column).toBe(0);
+  });
+
+  it("should  error flag for function type errors", () => {
+    const s = new SpreadSheet("s1", "0", [], 5, 5);
+    const {row,column} = s.decodeExcelCell('C4');
+    expect(row).toBe(1);
+    expect(column).toBe(0);
+  });
+
+  
+});
