@@ -28,12 +28,16 @@ const LoginScreen: React.FC<IProps> = () => {
         email: (event.target as any).username.value,
         password: (event.target as any).password.value,
         passwordConfirm: (event.target as any).password.value,
+        emailVisibility: true
       }
+      console.log(newUser);
       dispatch(switchLoading());
       pb.collection("users").create(newUser).then((res) => {
         dispatch(switchLoading());
       }).catch(err => {
-        alert("Error signing up");
+        dispatch(switchLoading());
+        console.error(err);
+        alert("Error signing up, password must be at least 8 characters long");
       });
 
       setIsSigningUp(false);
