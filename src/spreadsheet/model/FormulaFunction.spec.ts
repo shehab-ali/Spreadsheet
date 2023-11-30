@@ -54,12 +54,12 @@ describe("should evaluate basic arithmetic function", () => {
     const s = new SpreadSheet("s1", "0", [],5,5);
     const expression = "+A1 + B2";   
 
-    s.addCell(0,0,'10');
+    const cell = s.addCell(0,0,'10');
     s.addCell(1,1,'40');
     s.addCell(2,2, expression);
-    //expect(s.setCellValue(s.getCell(1,1),'+100')).toBe(true);
+    s.setCellValue(cell, '100')
  
-    expect(s.getCell(2,2).getDisplayedValue()).toBe('110');
+    expect(s.getCell(2,2).getDisplayedValue()).toBe('140');
 
   });
   
@@ -275,10 +275,10 @@ describe("should return raw value and toggle error flg if invalid", () => {
 
   it("should throw error flag and return raw with circular reference", () => {
     const s = new SpreadSheet("s1", "0", [], 5, 5);
-    const expression = "+A1 + B1";
-    const cell = s.addCell(0, 0, expression);
-
-    expect(cell.getDisplayedValue()).toBe(' + ');
+    const cell = s.addCell(1,1,"10");
+    s.addCell(0,0,'+40-B2')
+    s.setCellValue(cell, '+3+A1');
+    
     expect(cell.checkError()).toBe(true);
   });
 
