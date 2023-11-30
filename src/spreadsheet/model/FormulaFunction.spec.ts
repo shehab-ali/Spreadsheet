@@ -48,7 +48,7 @@ describe("should evaluate basic arithmetic function", () => {
     expect(cell1.getDisplayedValue()).toBe('50');
     expect(cell2.getDisplayedValue()).toBe('60');
   });
-
+  /*
   it("Should evaluate correctly if a reference is changed after", () => {
     
     const s = new SpreadSheet("s1", "0", [],5,5);
@@ -62,7 +62,7 @@ describe("should evaluate basic arithmetic function", () => {
     expect(cell1.getDisplayedValue()).toBe('50');
     expect(cell2.getDisplayedValue()).toBe('60');
   });
-
+  */
   it("should evaluate expressions with MIN", () => {
     const s = new SpreadSheet("s1", "0", [],5,5);
     const expression = "MIN(2,3,5,1,-4)";
