@@ -46,8 +46,10 @@ export class SpreadSheet {
 
   //returns list of changed cells
   private updateDisplayedValue(cell :Cell): Cell[]{
-    const [str, refList] = this.evaluateCell(cell.getRawValue(), this.getCellAddress(cell))
+    const [str, refList, err] = this.evaluateCell(cell.getRawValue(), this.getCellAddress(cell))
     cell.setDisplayValue(str);
+    if (err) cell.flagError();
+
     const refCells = this.getCellsFromAddresses(refList);
     for (const ref of refCells){
       const [updated] = this.evaluateCell(ref.getRawValue(), this.getCellAddress(ref))
@@ -57,17 +59,17 @@ export class SpreadSheet {
   }
 
   addCell(row: number, col: number, expression :string): Cell {
-    const [str] = this.evaluateCell(expression,this.getCellAddress(this.getCell(row,col)));
+    const [str, refList, err] = this.evaluateCell(expression,this.getCellAddress(this.getCell(row,col)));
     this.cells[row][col] = new Cell(expression, str);
+    if (err) this.cells[row][col].flagError();
     return this.cells[row][col];
   }
 
-  evaluateCell(expression :string, addr :string): [string, string[]]{
+  evaluateCell(expression :string, addr :string): [string, string[], boolean]{
     if (expression.trim().charAt(0) === '+') {
-
       return EvaluateExpression(expression, this.getCellTOValue(), addr);
     }
-    return [expression, []];
+    return [expression, [], false];
   }
 
   // Get the cell's address in A1 notation (e.g., "A1", "B2")
