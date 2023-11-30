@@ -23,6 +23,7 @@ import { pb } from "../../App";
 interface IProps {}
 
 interface IState {
+  username: string;
   spreadsheets: SpreadSheetWrapper[] | null;
   modalActive: boolean;
 }
@@ -34,13 +35,8 @@ export const FileSystemView: React.FC<IProps> = () => {
   useEffect(() => {
     const getSpreadSheet = async () => {
       try {
-        console.log(userId)
-        const spreadsheets = await pb.collection("spreadsheet").getFullList({expand: "users", filter: `users ~ '${userId}'`, requestKey: null});
-        // pocketbase rules do the filtering by user
-        // const spreadsheets = await pb
-        //   .collection("spreadsheet")
-        //   .getFullList({ expand: "users", filter: `users.id~'${userId}'` });
-
+        const spreadsheets = await pb.collection("spreadsheet").getFullList({expand: "users", filter: `users ~ '${userId}'`});
+        const username = (await pb.collection("users").getFullList({filter: `id = '${userId}'`}))[0].username
 
         const spreadSheetObjects = spreadsheets.map(
           (sheet: any) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.rows, sheet.cols, sheet.users)
@@ -49,6 +45,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         setState((prevState) => {
           return {
             ...prevState,
+            username: username,
             spreadsheets: spreadSheetObjects,
           };
         });
@@ -72,6 +69,7 @@ export const FileSystemView: React.FC<IProps> = () => {
   //     modalActive: false
   // });
   const [state, setState] = useState<IState>({
+    username: "",
     spreadsheets: null,
     modalActive: false,
   });
@@ -235,14 +233,14 @@ export const FileSystemView: React.FC<IProps> = () => {
 
     if (selectedSheet) {
       const email = e.target.elements.basicUrl.value;
-      const asdf = await pb.collection("users").getFullList();
+
       const userToShareWith = await pb.collection("users").getFullList({ filter: `email = '${email}'` });
-      console.log(userToShareWith)
 
       if (userToShareWith.length > 0) {
         const selectedId = selectedSheet.id;
-        const currentUsers = await pb.collection("spreadsheet").getFullList({ filter: `id = '${selectedId}'` });
-        await pb.collection("spreadsheet").update(selectedId, { users: [...currentUsers, userToShareWith] });
+        const oldSpreadsheet = await pb.collection("spreadsheet").getFullList({filter: `id = '${selectedId}'`});
+        const withNewUser = oldSpreadsheet[0].users.concat(userToShareWith[0].id);
+        await pb.collection("spreadsheet").update(selectedId, { users: withNewUser});
         alert('Spreadsheet shared successfully');
       } else {
         // Handle case where user with the entered email is not found
@@ -265,13 +263,12 @@ export const FileSystemView: React.FC<IProps> = () => {
         data.set(key, value.toString());
       });
 
-
       const newSheet = {
         name: data.get("spreadsheetTitle"),
         users: [userId],
         rows: data.get("numRows"),
         cols: data.get("numCols"),
-        cells : Array.from({ length: data.get("numRows") }, () => `[${Array(data.get("numCols")).fill('\'\'').join(', ')}]`).join(',')
+        cells : Array.from({ length: parseInt(data.get("numRows")) }, () => `[${Array(parseInt(data.get("numCols"))).fill('\'\'').join(', ')}]`).join(',')
       };
 
       try {
@@ -378,7 +375,7 @@ export const FileSystemView: React.FC<IProps> = () => {
       <div className="bg-light py-3 pl-3 spreadsheet-header row-container">
         <h2 className="mx-4">Your Spreadsheets</h2>
         <h4 className="mx-4">
-          John Doe
+          {state.username}
           <FaUserCircle size={40} className="mx-3" />
         </h4>
       </div>

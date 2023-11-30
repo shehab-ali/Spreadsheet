@@ -5,7 +5,7 @@ import { Cell } from "./Cell";
 describe("should evaluate basic arithmetic function", () => {
   it("should correctly evaluate basic arithmetic expressions", () => {
     const s = new SpreadSheet("s1", "0", [],5,5);
-    const expression = "2 + 3 * 4 / 2 - 1";
+    const expression = "+2 + 3 * 4 / 2 - 1";
     const cell = s.addCell(0,0,expression);
     expect(cell.getRawValue()).toBe(expression);
     expect(cell.getDisplayedValue()).toBe('7');
@@ -14,7 +14,7 @@ describe("should evaluate basic arithmetic function", () => {
   it("Should evaluate correctly with cell reference", () => {
     
     const s = new SpreadSheet("s1", "0", [],5,5);
-    const expression = "A1 + B2";    
+    const expression = "+A1 + B2";    
 
     s.addCell(0,0,'10');
     s.addCell(0,1,'8');
@@ -29,7 +29,7 @@ describe("should evaluate basic arithmetic function", () => {
     
     const s = new SpreadSheet("s1", "0", [],5,5);   
 
-    const cell = s.addCell(0,0,"'hi'");
+    const cell = s.addCell(0,0,'hi');
  
     expect(cell.getDisplayedValue()).toBe('hi');
   });
@@ -37,8 +37,8 @@ describe("should evaluate basic arithmetic function", () => {
   it("Should evaluate correctly with nested cell references", () => {
     
     const s = new SpreadSheet("s1", "0", [],5,5);
-    const expression = "A1 + B2";  
-    const expression2 = "A1 + C3";   
+    const expression = "+A1 + B2";  
+    const expression2 = "+A1 + C3";   
 
     s.addCell(0,0,'10');
     s.addCell(1,1,'40');
@@ -48,24 +48,24 @@ describe("should evaluate basic arithmetic function", () => {
     expect(cell1.getDisplayedValue()).toBe('50');
     expect(cell2.getDisplayedValue()).toBe('60');
   });
-  /*
+  
   it("Should evaluate correctly if a reference is changed after", () => {
     
     const s = new SpreadSheet("s1", "0", [],5,5);
-    const expression = "A1 + B2";   
+    const expression = "+A1 + B2";   
 
     s.addCell(0,0,'10');
     s.addCell(1,1,'40');
-    const cell1 = s.addCell(2,2, expression);
-    const cell2 = s.addCell(1,2, expression2)
+    s.addCell(2,2, expression);
+    //expect(s.setCellValue(s.getCell(1,1),'+100')).toBe(true);
  
-    expect(cell1.getDisplayedValue()).toBe('50');
-    expect(cell2.getDisplayedValue()).toBe('60');
+    expect(s.getCell(2,2).getDisplayedValue()).toBe('110');
+
   });
-  */
+  
   it("should evaluate expressions with MIN", () => {
     const s = new SpreadSheet("s1", "0", [],5,5);
-    const expression = "MIN(2,3,5,1,-4)";
+    const expression = "+MIN(2,3,5,1,-4)";
     const cell = s.addCell(0,0,expression);
     expect(cell.getRawValue()).toBe(expression);
     expect(cell.getDisplayedValue()).toBe('-4');
@@ -74,7 +74,7 @@ describe("should evaluate basic arithmetic function", () => {
 
   it("should evaluate expressions with MAX", () => {
     const s = new SpreadSheet("s1", "0", [],5,5);
-    const expression = "MAX(2,3,5,1,-4)";
+    const expression = "+MAX(2,3,5,1,-4)";
     const cell = s.addCell(0,0,expression);
     expect(cell.getRawValue()).toBe(expression);
     expect(cell.getDisplayedValue()).toBe('5');
@@ -82,7 +82,7 @@ describe("should evaluate basic arithmetic function", () => {
 
   it("should evaluate expressions with AVERAGE", () => {
     const s = new SpreadSheet("s1", "0", [],5,5);
-    const expression = "AVERAGE(2,3,5,1,-4)";
+    const expression = "+AVERAGE(2,3,5,1,-4)";
     const cell = s.addCell(0,0,expression);
     expect(cell.getRawValue()).toBe(expression);
     expect(cell.getDisplayedValue()).toBe('1.4');

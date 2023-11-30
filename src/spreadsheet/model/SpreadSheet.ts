@@ -32,7 +32,7 @@ export class SpreadSheet {
       }
     }
   }
-
+  
   setCells(cells: Cell[][]) {
     this.cells = cells;
   }
@@ -42,27 +42,36 @@ export class SpreadSheet {
     return this.cells[row][col];
   }
 
-  setCellValue(cell :Cell, value :string): void{
+  //returns list of changed cells 
+  setCellValue(cell :Cell, value :string): Cell[]{
     cell.setRawValue(value);
-    this.updateDisplayedValue(cell);
+    return this.updateDisplayedValue(cell);
   }
 
-  private updateDisplayedValue(cell :Cell){
-    cell.setDisplayValue(this.evaluateCell(cell.getRawValue()));
-
+  //returns list of changed cells
+  private updateDisplayedValue(cell :Cell): Cell[]{
+    const [str, refList] = this.evaluateCell(cell.getRawValue(), this.getCellAddress(cell))
+    cell.setDisplayValue(str);
+    const refCells = this.getCellsFromAddresses(refList);
+    for (const ref of refCells){
+      const [updated] = this.evaluateCell(ref.getRawValue(), this.getCellAddress(ref))
+      ref.setDisplayValue(updated);
+    }
+    return refCells;
   }
 
   addCell(row: number, col: number, expression :string): Cell {
-    this.cells[row][col] = new Cell(expression, this.evaluateCell(expression));
+    const [str] = this.evaluateCell(expression,this.getCellAddress(this.getCell(row,col)));
+    this.cells[row][col] = new Cell(expression, str);
     return this.cells[row][col];
   }
 
-  evaluateCell(expression :string): string{
+  evaluateCell(expression :string, addr :string): [string, string[]]{
     if (expression.trim().charAt(0) === '+') {
-      return EvaluateExpression(expression, this.getCellTOValue());
-    }
-    return expression;
 
+      return EvaluateExpression(expression, this.getCellTOValue(), addr);
+    }
+    return [expression, []];
   }
 
   // Get the cell's address in A1 notation (e.g., "A1", "B2")
@@ -143,4 +152,65 @@ export class SpreadSheet {
     
   }
  
+
+
+  private getCellsFromAddresses(refList: string[]): Cell[] {
+    const cells: Cell[] = [];
+  
+    for (const ref of refList) {
+      const cell = this.getCoordinates(ref);
+      if (cell) {
+        cells.push(cell);
+      }
+    }
+  
+    return cells;
+  }
+
+  private getCoordinates(str: string): Cell | undefined {
+   
+    const { row, column } = this.decodeExcelCell(str); // Function to decode cell reference to row and column
+    if (row < 1 || column < 1) {
+      return undefined; // Invalid cell address
+    }
+  
+    // Check if the cell exists in the spreadsheet
+    const numRows = this.getNumRows();
+    const numCols = this.getNumCols();
+    if (row > numRows || column > numCols) {
+      return undefined; // Cell is out of bounds
+    }
+  
+    // Get the cell at the specified coordinates
+    return this.getCell(row - 1, column - 1); // Adjusting 1-based indexing to 0-based indexing
+  
+  }
+
+  private decodeExcelCell(cellReference: string): { row: number; column: number } {
+    // Implement your decodeExcelCell function to extract row and column from cellReference
+    // Example implementation (considering A1, B2, etc. references)
+    const regex = /([A-Z]+)(\d+)/;
+    const match = cellReference.match(regex);
+  
+    if (!match) {
+      throw new Error("Invalid cell reference format");
+    }
+  
+    const columnString = match[1];
+    const rowString = match[2];
+  
+    // Convert column letters to column number
+    let column = 0;
+    for (let i = 0; i < columnString.length; i++) {
+      const charCode = columnString.charCodeAt(i) - "A".charCodeAt(0) + 1;
+      column = column * 26 + charCode;
+    }
+  
+    const row = parseInt(rowString, 10);
+  
+    return { row, column };
+  }
+ 
 }
+
+

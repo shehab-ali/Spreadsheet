@@ -4,7 +4,8 @@ import { SpreadSheet } from "./SpreadSheet";
 export function EvaluateExpression(
   expression: string,
   variables: Record<string, number | string>,
-): string {
+  address: string,
+): [string, string[]] {
   // Replace function names with their JavaScript counterparts
   expression = expression.replace(/MIN/g, "Math.min");
   expression = expression.replace(/MAX/g, "Math.max");
@@ -16,17 +17,27 @@ export function EvaluateExpression(
     (_, args) => `concat(${args})`
   );
   
+   const refList: string[] = [];
+   // Iterate through variables and check if their value contains the address
+   for (const [key, value] of Object.entries(variables)) {
+    if (typeof value === 'string' && value.includes(address)) {
+      refList.push(key); // Add the variable key to refList if value contains the address
+    }
+  }
 
   // Replace variables with their values
   expression = expression.replace(/[A-Za-z]\w*/g, (match) => {
-        const variableValue = variables[match];
-    return variableValue !== undefined ? variableValue.toString() : match;
+    const variableValue = variables[match];
+    if (variableValue !== undefined) {
+      return variableValue.toString();
+    }
+    return match;
   });
-
+  
   // Evaluate the expression
   const result = eval(expression);
 
-  return String(result);
+  return [String(result), refList];
 }
 
 function average(...numbers: number[]): number {
