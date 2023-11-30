@@ -23,6 +23,7 @@ import { pb } from "../../App";
 interface IProps {}
 
 interface IState {
+  username: string;
   spreadsheets: SpreadSheetWrapper[] | null;
   modalActive: boolean;
 }
@@ -34,13 +35,8 @@ export const FileSystemView: React.FC<IProps> = () => {
   useEffect(() => {
     const getSpreadSheet = async () => {
       try {
-        console.log(userId)
         const spreadsheets = await pb.collection("spreadsheet").getFullList({expand: "users", filter: `users ~ '${userId}'`});
-        // pocketbase rules do the filtering by user
-        // const spreadsheets = await pb
-        //   .collection("spreadsheet")
-        //   .getFullList({ expand: "users", filter: `users.id~'${userId}'` });
-
+        const username = (await pb.collection("users").getFullList({filter: `id = '${userId}'`}))[0].username
 
         const spreadSheetObjects = spreadsheets.map(
           (sheet: any) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.users)
@@ -49,6 +45,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         setState((prevState) => {
           return {
             ...prevState,
+            username: username,
             spreadsheets: spreadSheetObjects,
           };
         });
@@ -72,6 +69,7 @@ export const FileSystemView: React.FC<IProps> = () => {
   //     modalActive: false
   // });
   const [state, setState] = useState<IState>({
+    username: "",
     spreadsheets: null,
     modalActive: false,
   });
@@ -374,7 +372,7 @@ export const FileSystemView: React.FC<IProps> = () => {
       <div className="bg-light py-3 pl-3 spreadsheet-header row-container">
         <h2 className="mx-4">Your Spreadsheets</h2>
         <h4 className="mx-4">
-          John Doe
+          {state.username}
           <FaUserCircle size={40} className="mx-3" />
         </h4>
       </div>
