@@ -194,18 +194,63 @@ export const FileSystemView: React.FC<IProps> = () => {
           <FaPlus />
         </Button>
         <Button className="rounded mx-1 mb-3 btn-danger">
-          <FaTrash />
+          <FaTrash onClick={async () => {
+                const selectedId = state.spreadsheets?.filter((sheet) => sheet.isSelected)[0].id
+                console.log(selectedId)
+                if (selectedId) pb.collection("spreadsheet").delete(selectedId).then(
+                  async () => {
+                    setState({
+                      ...state,
+                      spreadsheets: await pb.collection("spreadsheet").getFullList({expand: "users", filter: `users ~ '${userId}'`})
+                    })
+                  }
+                )
+          }}/>
         </Button>
-        <Form.Label htmlFor="basic-url">
-          <Button className="rounded mx-1 btn-secondary">
-            <FaShare />
-          </Button>
-        </Form.Label>
-        <InputGroup className="mb-3">
-          <Form.Control id="basic-url" placeholder="example@gmail.com" />
-        </InputGroup>
+        <Form onSubmit={handleShare}>
+          <ButtonGroup className="">
+          <Form.Label htmlFor="basic-url">
+            <Button type="submit" className="rounded mx-1 btn-secondary">
+              <FaShare />
+            </Button>
+          </Form.Label>
+          <InputGroup className="mb-3">
+            <Form.Control
+              id="basic-url"
+              name="basicUrl"
+              placeholder="example@gmail.com"
+            />
+          </InputGroup>
+          </ButtonGroup>
+        </Form>
       </ButtonGroup>
     );
+  };
+
+  const handleShare = async (e: any) => {
+    e.preventDefault(); // Prevents the default form submission behavior
+
+    const selectedSheet = state.spreadsheets?.find((sheet) => sheet.isSelected);
+
+    if (selectedSheet) {
+      const email = e.target.elements.basicUrl.value;
+      const asdf = await pb.collection("users").getFullList();
+      const userToShareWith = await pb.collection("users").getFullList({ filter: `email = '${email}'` });
+      console.log(userToShareWith)
+
+      if (userToShareWith.length > 0) {
+        const selectedId = selectedSheet.id;
+        const currentUsers = await pb.collection("spreadsheet").getFullList({ filter: `id = '${selectedId}'` });
+        await pb.collection("spreadsheet").update(selectedId, { users: [...currentUsers, userToShareWith] });
+        alert('Spreadsheet shared successfully');
+      } else {
+        // Handle case where user with the entered email is not found
+        alert('User not found');
+      }
+    } else {
+      // Handle case where no spreadsheet is selected
+      alert('No spreadsheet selected');
+    }
   };
 
   const createModal = () => {
@@ -219,12 +264,13 @@ export const FileSystemView: React.FC<IProps> = () => {
         data.set(key, value.toString());
       });
 
-      // TODO: change this to represent form data!!!
+
       const newSheet = {
-        name: "test",
+        name: data.get("spreadsheetTitle"),
         users: [userId],
-        rows: 20,
-        cols: 20,
+        rows: data.get("numRows"),
+        cols: data.get("numCols"),
+        cells : Array.from({ length: data.get("numRows") }, () => `[${Array(data.get("numCols")).fill('\'\'').join(', ')}]`).join(',')
       };
 
       try {
