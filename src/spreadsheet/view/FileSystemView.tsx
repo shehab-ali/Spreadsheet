@@ -135,26 +135,25 @@ export const FileSystemView: React.FC<IProps> = () => {
   };
 
   const clickSpreadsheet = (spreadsheet: SpreadSheetWrapper) => {
-    navigate("/Spreadsheets/" + spreadsheet.id)
-    // if (state.spreadsheets) {
-    //   setState({
-    //     ...state,
-    //     spreadsheets: state.spreadsheets
-    //       .map((sheet) => {
-    //         if (sheet.id === spreadsheet.id && sheet.isSelected) {
-    //           navigate("/Spreadsheets/" + spreadsheet.id)
-    //           return sheet;
-    //         } else if (sheet.id === spreadsheet.id) {
-    //           sheet.isSelected = true;
-    //           return sheet;
-    //         } else {
-    //           sheet.isSelected = false;
-    //           return sheet;
-    //         }
-    //       })
-    //       .filter((sheet) => sheet !== undefined) as SpreadSheetWrapper[],
-    //   });
-    // }
+    if (state.spreadsheets) {
+      setState({
+        ...state,
+        spreadsheets: state.spreadsheets
+          .map((sheet) => {
+            if (sheet.id === spreadsheet.id && sheet.isSelected) {
+              navigate("/Spreadsheets/" + spreadsheet.id)
+              return sheet;
+            } else if (sheet.id === spreadsheet.id) {
+              sheet.isSelected = true;
+              return sheet;
+            } else {
+              sheet.isSelected = false;
+              return sheet;
+            }
+          })
+          .filter((sheet) => sheet !== undefined) as SpreadSheetWrapper[],
+      });
+    }
   };
 
   const clickAddSpreadsheet = (spreadsheet: SpreadSheetWrapper) => {
@@ -277,6 +276,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         console.log(state.spreadsheets);
         if (state.spreadsheets) {
           setState({
+            username: state.username,
             modalActive: false,
             spreadsheets: [
               ...state.spreadsheets,
