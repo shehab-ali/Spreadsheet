@@ -26,6 +26,10 @@ export const SpreadsheetView = () => {
   const [countdown, setCountdown] = useState(2);
   const [isChanging, setIsChanging] = useState(false);
 
+  // right click modal
+  const [showModal, setShowModal] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ top: 0, left: 0, row: 0, col: 0 });
+
   // given spreadsheet from pocketbase, returns model and stateCells
   const setCellsFromDb = (
     spreadsheet: RecordModel
@@ -355,6 +359,25 @@ export const SpreadsheetView = () => {
       });
     }
   };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const handleRightClick = (event: React.MouseEvent<HTMLInputElement, MouseEvent>, row: number, col: number) => {
+    event.preventDefault(); // This line prevents the default context menu from showing
+    (event.target as HTMLInputElement).blur();
+    console.log(event)
+
+    setShowModal(true); // Show the modal
+    setModalPosition({ // Set the position of the modal
+      top: event.clientY,
+      left: event.clientX,
+      row: row,
+      col: col
+    });
+  }
+
   // this value changes when cells are clicked
   // initialized to A1, which is 0,0
   interface HighlightedCell {
@@ -429,6 +452,7 @@ export const SpreadsheetView = () => {
                   value={cells[j - 1][i - 1]}
                   onChange={(event) => handleChangeCell(event, j - 1, i - 1)}
                   onClick={(event) => handleClick(event, j - 1, i - 1)}
+                  onContextMenu={(event) => handleRightClick(event, j - 1, i - 1)}
                 ></input>
               )}
             </div>
@@ -458,10 +482,42 @@ export const SpreadsheetView = () => {
     return <FaSave className={iconClass} />;
   };
 
+  const deleteRow = () => {
+  }
+
+  const deleteColumn = () => {
+
+  }
+
+  const insertRow = () => {
+    
+  }
+
+  const insertColumn = () => {
+
+  }
+
   return (
     <>
       {cells.length > 0 && spreadsheet && (
-        <div>
+        <div onClick={closeModal}>
+          {showModal && (
+            <div
+              style={{
+                position: 'absolute',
+                top: `${modalPosition.top}px`,
+                left: `${modalPosition.left}px`,
+                border: '1px solid black',
+                padding: '10px',
+                backgroundColor: 'white'
+              }}
+            >
+              <div onClick={deleteRow}>Delete Row</div>
+              <div onClick={deleteColumn}>Delete Column</div>
+              <div onClick={insertRow}>Insert Row</div>
+              <div onClick={insertColumn}>Insert Column</div>
+            </div>
+          )}
           <div className="bg-light py-5 mb-5 spreadsheet-header row-container">
             <IoIosArrowBack
               className="back-arrow"
