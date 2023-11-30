@@ -5,7 +5,7 @@ export function EvaluateExpression(
   expression: string,
   variables: Record<string, number | string>,
   address: string,
-): [string, string[]] {
+): [string, string[], boolean] {
   // Replace function names with their JavaScript counterparts
   expression = expression.replace(/MIN/g, "Math.min");
   expression = expression.replace(/MAX/g, "Math.max");
@@ -24,26 +24,28 @@ export function EvaluateExpression(
       refList.push(key); // Add the variable key to refList if value contains the address
     }
   }
-
+  
+  
   // Replace variables with their values
   expression = expression.replace(/[A-Za-z]\w*/g, (match) => {
     const variableValue = variables[match];
-    if (variableValue !== undefined) {
-      return variableValue.toString();
-    }
-    return match;
+    return variableValue !== undefined ? variableValue.toString() : match;
   });
-  
-  // Evaluate the expression
+
+  //return [expression, refList, true];
   
   try {
     // Attempt to evaluate the expression
     const result = eval(expression);
-    return [String(result), refList];
+
+    //if (result.includes('NaN')) return [expression, refList, true];
+    return [String(result), refList, false];
+
   } catch (error) {
-    // If an error occurs during evaluation, return the original expression
-    return [expression, refList];
+    // If an error occurs during evaluation, return the original expression and throw flag
+    return [expression, refList, true];
   }
+  
    
 }
 
