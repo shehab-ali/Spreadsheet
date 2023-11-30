@@ -19,8 +19,7 @@ export function EvaluateExpression(
 
   // Replace variables with their values
   expression = expression.replace(/[A-Za-z]\w*/g, (match) => {
-    //const variables: Record<string, number | string> = 
-    const variableValue = variables[match];
+        const variableValue = variables[match];
     return variableValue !== undefined ? variableValue.toString() : match;
   });
 
@@ -28,36 +27,6 @@ export function EvaluateExpression(
   const result = eval(expression);
 
   return String(result);
-}
-
-export function DecodeExcelCell(cellReference: string): {
-  row: number;
-  column: number;
-} {
-  const regex = /([A-Z]+)(\d+)/;
-  const match = cellReference.match(regex);
-
-  if (!match) {
-    throw new Error("Invalid cell reference format");
-  }
-
-  const columnString = match[1];
-  const rowString = match[2];
-
-  // Convert column letters to column number
-  let column = 0;
-  for (let i = 0; i < columnString.length; i++) {
-    const charCode = columnString.charCodeAt(i) - "A".charCodeAt(0) + 1;
-    column = column * 26 + charCode;
-  }
-
-  const row = parseInt(rowString, 10);
-
-  return { row, column };
-  // Examples
-  // console.log(decodeExcelCell("A1"));  // Output: { row: 1, column: 1 }
-  // console.log(decodeExcelCell("Z2"));  // Output: { row: 2, column: 26 }
-  // console.log(decodeExcelCell("AA1")); // Output: { row: 1, column: 27 }
 }
 
 function average(...numbers: number[]): number {
