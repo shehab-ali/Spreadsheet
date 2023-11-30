@@ -116,11 +116,11 @@ export const SpreadsheetView = () => {
 
   useEffect(() => {
     const persist = async () => {
-      if (sheetId) {
+      if (sheetId && spreadsheet) {
         const cellsAsString = spreadSheetToString();
         const record = await pb
           .collection("spreadsheet")
-          .update(sheetId, { cells: cellsAsString });
+          .update(sheetId, { cells: cellsAsString, rows: spreadsheet.rows, cols: spreadsheet.cols });
       }
     };
 
@@ -489,42 +489,83 @@ export const SpreadsheetView = () => {
   }
 
   const deleteRow = () => {
-    // delete row in modal
-    // get list of list of string representation of cells from modal
-    // reset Cells state
-    // 
-  }
-
-  const deleteColumn = () => {
-    console.log(modalPosition.col)
     if (spreadsheet) {
-      // if (isChanging) {
-      //   resetTimer();
-      //   startTimer();
-      // } else {
-      //   startTimer();
-      // }
-      const copy: string[][] = cells.map((innerArray, i) => [...innerArray]);
-      const setCopy = copy.filter((row, i) => i > 0)
+      if (isChanging) {
+        resetTimer();
+        startTimer();
+      } else {
+        startTimer();
+      }
 
-      spreadsheet.deleteRow(0)
-      console.log(spreadsheet.rows)
-      console.log(spreadsheet.cols)
+      spreadsheet.deleteCol(modalPosition.row)
 
       const cellsString = modalToString()
 
       if (cellsString) {
-        //setCells(setCopy)
+        setCells(cellsString)
+      }
+    }
+  }
+
+  const deleteColumn = () => {
+    if (spreadsheet) {
+      if (isChanging) {
+        resetTimer();
+        startTimer();
+      } else {
+        startTimer();
+      }
+
+      spreadsheet.deleteRow(modalPosition.col)
+
+      const cellsString = modalToString()
+
+      if (cellsString) {
+        setCells(cellsString)
       }
     }
   }
 
   const insertRow = () => {
-    
+    if (spreadsheet) {
+      if (isChanging) {
+        resetTimer();
+        startTimer();
+      } else {
+        startTimer();
+      }
+
+      console.log(spreadsheet.rows)
+      console.log(spreadsheet.cols)
+      spreadsheet.insertCol(modalPosition.row)
+
+      const cellsString = modalToString()
+      console.log(spreadsheet.rows)
+      console.log(spreadsheet.cols)
+
+      if (cellsString) {
+        setCells(cellsString)
+      }
+    }
   }
 
   const insertColumn = () => {
+    if (spreadsheet) {
+      if (isChanging) {
+        resetTimer();
+        startTimer();
+      } else {
+        startTimer();
+      }
 
+      spreadsheet.insertRow(modalPosition.col)
+
+      const cellsString = modalToString()
+
+      if (cellsString) {
+        setCells(cellsString)
+      }
+    }
   }
 
   return (
