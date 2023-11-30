@@ -11,10 +11,12 @@ export class SpreadSheetWrapper extends SpreadSheet {
     name: string,
     id: string,
     users: number[],
+    rows: number,
+    cols: number,
     isSelected?: boolean,
     cells?: Cell[][]
   ) {
-    super(name, id, users, cells);
+    super(name, id, users, rows, cols, cells);
   }
 
   setSelected(value: boolean): void {
