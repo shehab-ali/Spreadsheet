@@ -39,7 +39,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         const username = (await pb.collection("users").getFullList({filter: `id = '${userId}'`}))[0].username
 
         const spreadSheetObjects = spreadsheets.map(
-          (sheet: any) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.users)
+          (sheet: any) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.rows, sheet.cols, sheet.users)
         );
 
         setState((prevState) => {
@@ -267,7 +267,7 @@ export const FileSystemView: React.FC<IProps> = () => {
         users: [userId],
         rows: data.get("numRows"),
         cols: data.get("numCols"),
-        cells : Array.from({ length: parseInt(data.get("numRows")) }, () => `[${Array(parseInt(data.get("numCols"))).fill('\'\'').join(', ')}]`).join(',')
+        cells : Array.from({ length: parseInt(data.get("numRows")) }, () => `[${Array(parseInt(data.get("numCols"))).fill('\'\'').join(',')}]`).join('')
       };
 
       try {
@@ -276,13 +276,16 @@ export const FileSystemView: React.FC<IProps> = () => {
         console.log(state.spreadsheets);
         if (state.spreadsheets) {
           setState({
+            username: state.username,
             modalActive: false,
             spreadsheets: [
               ...state.spreadsheets,
               new SpreadSheetWrapper(
                 record.name,
                 record.id,
-                record.users
+                record.users,
+                record.rows,
+                record.cols
               ) as SpreadSheetWrapper,
             ],
           });
