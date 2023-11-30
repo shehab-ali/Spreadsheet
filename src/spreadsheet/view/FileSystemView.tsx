@@ -234,14 +234,14 @@ export const FileSystemView: React.FC<IProps> = () => {
 
     if (selectedSheet) {
       const email = e.target.elements.basicUrl.value;
-      const asdf = await pb.collection("users").getFullList();
+
       const userToShareWith = await pb.collection("users").getFullList({ filter: `email = '${email}'` });
-      console.log(userToShareWith)
 
       if (userToShareWith.length > 0) {
         const selectedId = selectedSheet.id;
-        const currentUsers = await pb.collection("spreadsheet").getFullList({ filter: `id = '${selectedId}'` });
-        await pb.collection("spreadsheet").update(selectedId, { users: [...currentUsers, userToShareWith] });
+        const oldSpreadsheet = await pb.collection("spreadsheet").getFullList({filter: `id = '${selectedId}'`});
+        const withNewUser = oldSpreadsheet[0].users.concat(userToShareWith[0].id);
+        await pb.collection("spreadsheet").update(selectedId, { users: withNewUser});
         alert('Spreadsheet shared successfully');
       } else {
         // Handle case where user with the entered email is not found
@@ -264,13 +264,12 @@ export const FileSystemView: React.FC<IProps> = () => {
         data.set(key, value.toString());
       });
 
-
       const newSheet = {
         name: data.get("spreadsheetTitle"),
         users: [userId],
         rows: data.get("numRows"),
         cols: data.get("numCols"),
-        cells : Array.from({ length: data.get("numRows") }, () => `[${Array(data.get("numCols")).fill('\'\'').join(', ')}]`).join(',')
+        cells : Array.from({ length: parseInt(data.get("numRows")) }, () => `[${Array(parseInt(data.get("numCols"))).fill('\'\'').join(', ')}]`).join(',')
       };
 
       try {
