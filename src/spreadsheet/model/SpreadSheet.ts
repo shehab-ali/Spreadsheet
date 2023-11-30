@@ -1,6 +1,8 @@
 import { Cell } from "./Cell";
 import { User } from "./User";
-import { DecodeExcelCell } from "./FormulaFunctions";
+import { EvaluateExpression } from "./FormulaFunctions";
+
+//import { DecodeExcelCell } from "./FormulaFunctions";
 
 export class SpreadSheet {
   name: string;
@@ -9,13 +11,23 @@ export class SpreadSheet {
   cells: Cell[][] = [];
 
   
-  constructor(name: string, id: string, users: number[], cells?: Cell[][]) {
-    if (typeof cells !== "undefined") {
-      this.cells = cells;
-    }
+  constructor(name: string, id: string, users: number[], rows :number, cols :number, cells?: Cell[][]) {
+    
     this.name = name;
     this.id = id;
     this.users = users;
+
+    if (typeof cells !== "undefined") {
+      this.cells = cells;
+    } else {
+      this.cells = [];
+      for (let i = 0; i < rows; i++) {
+        this.cells[i] = [];
+        for (let j = 0; j < cols; j++) {
+          this.cells[i][j] = new Cell('',''); // Initialize each cell with a default value (e.g., 0)
+        }
+      }
+    }
   }
 
   setCells(cells: Cell[][]) {
@@ -25,6 +37,25 @@ export class SpreadSheet {
   // Get a cell at a specific row and column
   getCell(row: number, col: number): Cell {
     return this.cells[row][col];
+  }
+
+  setCellValue(cell :Cell, value :string): void{
+    cell.setRawValue(value);
+    this.updateDisplayedValue(cell);
+  }
+
+  updateDisplayedValue(cell :Cell){
+    cell.setDisplayValue(this.evaluateCell(cell.getRawValue()));
+
+  }
+
+  addCell(row: number, col: number, expression :string): Cell {
+    this.cells[row][col] = new Cell(expression, this.evaluateCell(expression));
+    return this.cells[row][col];
+  }
+
+  evaluateCell(expression :string): string{
+    return EvaluateExpression(expression, this.getCellTOValue());
   }
 
   // Get the cell's address in A1 notation (e.g., "A1", "B2")
@@ -61,7 +92,7 @@ export class SpreadSheet {
     if (rowNumber >= 0 && rowNumber <= this.cells.length) {
       const newRow = new Array(this.cells[0].length);
       for (let i = 0; i < newRow.length; i++) {
-        newRow[i] = new Cell("", this);
+        newRow[i] = new Cell("");
       }
       this.cells.splice(rowNumber, 0, newRow);
     }
@@ -71,7 +102,7 @@ export class SpreadSheet {
   insertCol(colNumber: number): void {
     if (colNumber >= 0 && colNumber <= this.cells[0].length) {
       for (let row = 0; row < this.cells.length; row++) {
-        const newCell = new Cell("", this);
+        const newCell = new Cell("");
         this.cells[row].splice(colNumber, 0, newCell);
       }
     }
@@ -89,7 +120,7 @@ export class SpreadSheet {
   }
 
   save(): void {}
-
+  
   // Returns a map of each cell address to its displayed value. ex: { 'A6': 2, 'R3': 5}
   getCellTOValue(): Record<string, number | string> {
     const values: Record<string, number> = {};
@@ -102,5 +133,7 @@ export class SpreadSheet {
       }
     }
     return values;
+    
   }
+ 
 }
