@@ -242,11 +242,14 @@ describe("should return raw value and toggle error flg if invalid", () => {
     const expression = "+CONCAT(A1,B1)";   
 
     s.addCell(0,0,'App');
-    s.addCell(0,1,'Bob');
+    s.addCell(0,1,'Cat');
     const cell = s.addCell(2,2, expression);
  
     expect(cell.getDisplayedValue()).toBe('6');
     //expect(cell1.checkError()).toBe(false);
   });
+
+
+
 
 });
