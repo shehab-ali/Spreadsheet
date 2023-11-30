@@ -15,38 +15,32 @@ import { pb } from "../../App";
 import { start } from "repl";
 import { RecordModel } from "pocketbase";
 
-type ModelData = {
-  model: SpreadSheet;
-  rows: number;
-  cols: number;
-};
 
 export const SpreadsheetView = () => {
   let { sheetId } = useParams();
   const navigate = useNavigate();
   const { userId } = useSelector((state: RootState) => state.loginUser);
 
-  const [cells, setCells] = useState<Cell[][]>([]);
-  const [modelData, setModelData] = useState<ModelData>();
+  const [cells, setCells] = useState<string[][]>([]);
+  const [spreadsheet, setSpreadsheet] = useState<SpreadSheet>();
 
   const [countdown, setCountdown] = useState(2);
   const [isChanging, setIsChanging] = useState(false);
 
-  const setCellsFromDb = (
-    spreadsheet: RecordModel,
-    model: SpreadSheet | null
-  ) => {
-    const cellObjs = stringToSpreadSheet(spreadsheet.cells);
-    if (model) {
-      model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, model))));
-      setCells(model.cells);
-    }
-    else if (modelData) {
-      modelData.model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, modelData.model))));
-      setCells(modelData.model.cells);
-    } 
+  // const setCellsFromDb = (
+  //   model: SpreadSheet
+  // ) => {
+  //   const cellObjs = stringToSpreadSheet(spreadsheet.cells);
+  //   if (model) {
+  //     model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, model))));
+  //     setCells(model.cells);
+  //   }
+  //   else if (modelData) {
+  //     modelData.model.setCells(cellObjs.map((row) => row.map((cell) => new Cell(cell, modelData.model))));
+  //     setCells(modelData.model.cells);
+  //   } 
 
-  };
+  // };
 
   useEffect(() => {
     const setSpreadSheet = async () => {
@@ -58,17 +52,37 @@ export const SpreadsheetView = () => {
           .collection("spreadsheet")
           .getFirstListItem(`id="${sheetId}"`, { requestKey: null });
 
+        const cellObjs = stringToSpreadSheet(spreadsheet.cells);
+
         const model = new SpreadSheet(
           spreadsheet.name,
           spreadsheet.id,
-          spreadsheet.users
+          spreadsheet.users,
+          spreadsheet.rows,
+          spreadsheet.cols
         );
-        setModelData({
-          model: model,
-          rows: spreadsheet.rows,
-          cols: spreadsheet.cols,
-        });
-        setCellsFromDb(spreadsheet, model);
+
+        let stateCells = []
+
+        for (let row = 0; row < cellObjs.length; row++) {
+          let stateCellRow = []
+          for (let col = 0; col < cellObjs[row].length; col++) {
+            model.addCell(row, col, cellObjs[row][col])
+            stateCellRow.push(cellObjs[row][col])
+          }
+          stateCells.push(stateCellRow)
+        }
+        
+        setSpreadsheet(model)
+        setCells(stateCells)
+        setHighlightedCell((prevState) => {
+          return {
+            ...prevState,
+            value: model.getCell(0, 0).getRawValue()
+          }
+        })
+      
+        //setCellsFromDb(model);
       } catch (error) {
         console.log(error);
         navigate("/Unauthorized");
@@ -84,35 +98,35 @@ export const SpreadsheetView = () => {
     // }
   }, []);
 
-  useEffect(() => {
-    const persist = async () => {
-      if (sheetId) {
-        const cellsAsString = spreadSheetToString(cells);
-        const record = await pb
-          .collection("spreadsheet")
-          .update(sheetId, { cells: cellsAsString });
+  // useEffect(() => {
+  //   const persist = async () => {
+  //     if (sheetId) {
+  //       const cellsAsString = spreadSheetToString(cells);
+  //       const record = await pb
+  //         .collection("spreadsheet")
+  //         .update(sheetId, { cells: cellsAsString });
 
-        setCellsFromDb(record, null);
-      }
-    };
+  //       setCellsFromDb(record, null);
+  //     }
+  //   };
 
-    let interval: ReturnType<typeof setInterval> | undefined = undefined;
+  //   let interval: ReturnType<typeof setInterval> | undefined = undefined;
 
-    if (isChanging && countdown > 0) {
-      interval = setInterval(() => {
-        setCountdown((seconds) => seconds - 1);
-      }, 1000);
-    } else if (countdown === 0) {
-      // persist changes to database and reset frontend
-      console.log("persisting");
-      persist();
+  //   if (isChanging && countdown > 0) {
+  //     interval = setInterval(() => {
+  //       setCountdown((seconds) => seconds - 1);
+  //     }, 1000);
+  //   } else if (countdown === 0) {
+  //     // persist changes to database and reset frontend
+  //     console.log("persisting");
+  //     persist();
 
-      setIsChanging(false);
-      setCountdown(2); // Reset the timer automatically
-    }
+  //     setIsChanging(false);
+  //     setCountdown(2); // Reset the timer automatically
+  //   }
 
-    return () => clearInterval(interval);
-  }, [isChanging, countdown]);
+  //   return () => clearInterval(interval);
+  // }, [isChanging, countdown]);
 
   const resetTimer = () => {
     setIsChanging(false);
@@ -162,59 +176,59 @@ export const SpreadsheetView = () => {
     });
   }
 
-  const handleChangeCell = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    rowIdx: number,
-    colIdx: number
-  ) => {
-    if (modelData) {
-      if (isChanging) {
-        resetTimer();
-        startTimer();
-      } else {
-        startTimer();
-      }
-      setCells((prevCells: Cell[][]) => {
-        return prevCells.map((row: Cell[], i) =>
-          i === rowIdx
-            ? row.map((cell: Cell, j) =>
-                j === colIdx
-                  ? (() => {
-                    const updatedCell = new Cell(event.target.value, modelData.model);
-                    modelData.model.cells[rowIdx][colIdx] = updatedCell;
-                    return updatedCell;
-                  })()
-                  : cell
-              )
-            : row
-        );
-      });
-    }
-  };
+  // const handleChangeCell = (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  //   rowIdx: number,
+  //   colIdx: number
+  // ) => {
+  //   if (modelData) {
+  //     if (isChanging) {
+  //       resetTimer();
+  //       startTimer();
+  //     } else {
+  //       startTimer();
+  //     }
+  //     setCells((prevCells: Cell[][]) => {
+  //       return prevCells.map((row: Cell[], i) =>
+  //         i === rowIdx
+  //           ? row.map((cell: Cell, j) =>
+  //               j === colIdx
+  //                 ? (() => {
+  //                   const updatedCell = new Cell(event.target.value, modelData.model);
+  //                   modelData.model.cells[rowIdx][colIdx] = updatedCell;
+  //                   return updatedCell;
+  //                 })()
+  //                 : cell
+  //             )
+  //           : row
+  //       );
+  //     });
+  //   }
+  // };
 
-  const handleInsertFormula = (
-    forumula: string,
-    rowIdx: number,
-    colIdx: number
-  ) => {
-    if (modelData) {
-      setCells((prevCells: Cell[][]) => {
-        return prevCells.map((row: Cell[], i) =>
-          i === rowIdx
-            ? row.map((cell: Cell, j) =>
-                j === colIdx
-                ? (() => {
-                  const updatedCell = new Cell(cell.getRawValue() + forumula, modelData.model)
-                  modelData.model.cells[rowIdx][colIdx] = updatedCell;
-                  return updatedCell;
-                })()
-                : cell
-              )
-            : row
-        );
-      });
-    }
-  };
+  // const handleInsertFormula = (
+  //   forumula: string,
+  //   rowIdx: number,
+  //   colIdx: number
+  // ) => {
+  //   if (modelData) {
+  //     setCells((prevCells: Cell[][]) => {
+  //       return prevCells.map((row: Cell[], i) =>
+  //         i === rowIdx
+  //           ? row.map((cell: Cell, j) =>
+  //               j === colIdx
+  //               ? (() => {
+  //                 const updatedCell = new Cell(cell.getRawValue() + forumula, modelData.model)
+  //                 modelData.model.cells[rowIdx][colIdx] = updatedCell;
+  //                 return updatedCell;
+  //               })()
+  //               : cell
+  //             )
+  //           : row
+  //       );
+  //     });
+  //   }
+  // };
 
   const handleDoubleClick = (
     event: React.MouseEvent<HTMLInputElement, MouseEvent>,
@@ -265,11 +279,13 @@ export const SpreadsheetView = () => {
     row: number;
     col: number;
     focused: boolean;
+    value: string | null
   }
   const [highlightedCell, setHighlightedCell] = useState<HighlightedCell>({
     row: 0,
     col: 0,
     focused: false,
+    value: null
   }); // holds index of highlighted cell and
 
   /* 
@@ -287,12 +303,12 @@ export const SpreadsheetView = () => {
   */
 
   const generateGrid = () => {
-    if (modelData) {
+    if (spreadsheet) {
       const grid = [];
 
-      for (let i = 0; i < modelData.rows + 1; i++) {
+      for (let i = 0; i < spreadsheet.rows + 1; i++) {
         const row = [];
-        for (let j = 0; j < modelData.cols + 1; j++) {
+        for (let j = 0; j < spreadsheet.cols + 1; j++) {
           row.push(
             <div
               key={`${i}-${j}`}
@@ -318,23 +334,45 @@ export const SpreadsheetView = () => {
                       : ""
                   }`}
                   style={{ width: "98px" }}
-                  onDoubleClick={(event) =>
-                    handleDoubleClick(event, j - 1, i - 1)
+                  /*
+                  On double click, get raw value from model and set cell to raw value in frontend
+                  Onblur, get displayed value from model and set cell in Cells to this value
+                  On change, get cell in model, set cell in the model, get raw value and set that
+                    to current cell in Cells
+                  
+                  OnClick, set highlightedCell to raw value from model of current highlighted cell,
+                  and set row, col, and focused
+                  
+                  Highlighted Cell {
+                    row,
+                    col,
+                    value,
+                    focused
                   }
-                  onBlur={() =>
-                    setHighlightedCell((prevState) => {
-                      return { ...prevState, focused: false };
-                    })
-                  }
-                  value={
-                    highlightedCell.focused &&
-                    highlightedCell.row === j - 1 &&
-                    highlightedCell.col === i - 1
-                      ? cells[j - 1][i - 1].getRawValue()
-                      : cells[j - 1][i - 1].getDisplayedValue()
-                  }
-                  onChange={(event) => handleChangeCell(event, j - 1, i - 1)}
-                  onClick={(event) => handleClick(event, j - 1, i - 1)}
+
+                  Highlighted Cell Editor
+                  OnChange, get cell in model, set cell in model, get raw value and set that
+                    to highlightedCell.value and Cells
+
+                  */
+                  // onDoubleClick={(event) =>
+                  //   handleDoubleClick(event, j - 1, i - 1)
+                  // }
+                  // onBlur={() =>
+                  //   setHighlightedCell((prevState) => {
+                  //     return { ...prevState, focused: false };
+                  //   })
+                  // }
+                  // value={
+                  //   highlightedCell.focused &&
+                  //   highlightedCell.row === j - 1 &&
+                  //   highlightedCell.col === i - 1
+                  //     ? cells[j - 1][i - 1].getRawValue()
+                  //     : cells[j - 1][i - 1].getDisplayedValue()
+                  // }
+                  value={cells[j - 1][i - 1]}
+                  // onChange={(event) => handleChangeCell(event, j - 1, i - 1)}
+                  // onClick={(event) => handleClick(event, j - 1, i - 1)}
                 ></input>
               )}
             </div>
@@ -344,7 +382,7 @@ export const SpreadsheetView = () => {
           <div
             key={i}
             className="row"
-            style={{ gridTemplateRows: `repeat(${modelData.rows + 1}, 40px)` }}
+            style={{ gridTemplateRows: `repeat(${spreadsheet.rows + 1}, 40px)` }}
           >
             {row}
           </div>
@@ -366,7 +404,7 @@ export const SpreadsheetView = () => {
 
   return (
     <>
-      {cells.length > 0 && modelData && (
+      {cells.length > 0 && spreadsheet && (
         <div>
           <div className="bg-light py-5 mb-5 spreadsheet-header row-container">
             <IoIosArrowBack
@@ -382,7 +420,7 @@ export const SpreadsheetView = () => {
               >
                 <SaveIcon isChanging={isChanging} />
               </Button>
-              <DropdownButton
+              {/* <DropdownButton
                 className="mx-1"
                 id="file-dropdown"
                 title="Insert"
@@ -453,8 +491,8 @@ export const SpreadsheetView = () => {
                 >
                   concat
                 </Dropdown.Item>
-              </DropdownButton>
-              <input
+              </DropdownButton> */}
+              {/* <input
                 type="text"
                 className="form-control rounded-0"
                 style={{ width: "400px", marginBottom: 10 }}
@@ -468,12 +506,12 @@ export const SpreadsheetView = () => {
                     highlightedCell.col
                   )
                 }
-              ></input>
+              ></input> */}
             </div>
             <div
               className="grid"
               style={{
-                gridTemplateColumns: `repeat(${modelData.cols + 1}, 100px)`,
+                gridTemplateColumns: `repeat(${spreadsheet.cols + 1}, 100px)`,
               }}
             >
               {generateGrid()}

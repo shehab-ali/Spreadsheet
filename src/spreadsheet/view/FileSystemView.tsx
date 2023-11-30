@@ -35,7 +35,7 @@ export const FileSystemView: React.FC<IProps> = () => {
     const getSpreadSheet = async () => {
       try {
         console.log(userId)
-        const spreadsheets = await pb.collection("spreadsheet").getFullList({expand: "users", filter: `users ~ '${userId}'`});
+        const spreadsheets = await pb.collection("spreadsheet").getFullList({expand: "users", filter: `users ~ '${userId}'`, requestKey: null});
         // pocketbase rules do the filtering by user
         // const spreadsheets = await pb
         //   .collection("spreadsheet")
@@ -43,7 +43,7 @@ export const FileSystemView: React.FC<IProps> = () => {
 
 
         const spreadSheetObjects = spreadsheets.map(
-          (sheet: any) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.users)
+          (sheet: any) => new SpreadSheetWrapper(sheet.name, sheet.id, sheet.rows, sheet.cols, sheet.users)
         );
 
         setState((prevState) => {
@@ -137,25 +137,26 @@ export const FileSystemView: React.FC<IProps> = () => {
   };
 
   const clickSpreadsheet = (spreadsheet: SpreadSheetWrapper) => {
-    if (state.spreadsheets) {
-      setState({
-        ...state,
-        spreadsheets: state.spreadsheets
-          .map((sheet) => {
-            if (sheet.id === spreadsheet.id && sheet.isSelected) {
-              navigate("/Spreadsheets/" + spreadsheet.id)
-              return sheet;
-            } else if (sheet.id === spreadsheet.id) {
-              sheet.isSelected = true;
-              return sheet;
-            } else {
-              sheet.isSelected = false;
-              return sheet;
-            }
-          })
-          .filter((sheet) => sheet !== undefined) as SpreadSheetWrapper[],
-      });
-    }
+    navigate("/Spreadsheets/" + spreadsheet.id)
+    // if (state.spreadsheets) {
+    //   setState({
+    //     ...state,
+    //     spreadsheets: state.spreadsheets
+    //       .map((sheet) => {
+    //         if (sheet.id === spreadsheet.id && sheet.isSelected) {
+    //           navigate("/Spreadsheets/" + spreadsheet.id)
+    //           return sheet;
+    //         } else if (sheet.id === spreadsheet.id) {
+    //           sheet.isSelected = true;
+    //           return sheet;
+    //         } else {
+    //           sheet.isSelected = false;
+    //           return sheet;
+    //         }
+    //       })
+    //       .filter((sheet) => sheet !== undefined) as SpreadSheetWrapper[],
+    //   });
+    // }
   };
 
   const clickAddSpreadsheet = (spreadsheet: SpreadSheetWrapper) => {
@@ -285,7 +286,9 @@ export const FileSystemView: React.FC<IProps> = () => {
               new SpreadSheetWrapper(
                 record.name,
                 record.id,
-                record.users
+                record.users,
+                record.rows,
+                record.cols
               ) as SpreadSheetWrapper,
             ],
           });
