@@ -102,10 +102,10 @@ export class SpreadSheet {
 
   // Get the cell's address in A1 notation (e.g., "A1", "B2")
   getCellAddress(cell: Cell): string {
-    const row = this.cells.findIndex((row) => row.includes(cell));
-    const col = this.cells[row].indexOf(cell);
-    const colLabel = String.fromCharCode("A".charCodeAt(0) + col);
-    return colLabel + (row + 1);
+    const row = this.cells.findIndex(row => row.includes(cell)) + 1; // Adding 1 for the 1-based indexing
+    const col = this.cells[row - 1].indexOf(cell); // Decrementing row by 1 to match 0-based indexing
+    const colLabel = String.fromCharCode('A'.charCodeAt(0) + col);
+    return colLabel + row; // Using 'A3' format for cell addressing
   }
 
   // renames the spreadsheet to newName.
@@ -208,14 +208,12 @@ export class SpreadSheet {
   
   }
 
-  private decodeExcelCell(cellReference: string): { row: number; column: number } {
-    // Implement your decodeExcelCell function to extract row and column from cellReference
-    // Example implementation (considering A1, B2, etc. references)
+  decodeExcelCell(cellReference: string): { row: number; column: number } {
     const regex = /([A-Z]+)(\d+)/;
     const match = cellReference.match(regex);
   
     if (!match) {
-      throw new Error("Invalid cell reference format");
+      throw new Error('Invalid cell reference format');
     }
   
     const columnString = match[1];
@@ -224,14 +222,16 @@ export class SpreadSheet {
     // Convert column letters to column number
     let column = 0;
     for (let i = 0; i < columnString.length; i++) {
-      const charCode = columnString.charCodeAt(i) - "A".charCodeAt(0) + 1;
+      const charCode = columnString.charCodeAt(i) - 'A'.charCodeAt(0) + 1;
       column = column * 26 + charCode;
     }
   
     const row = parseInt(rowString, 10);
   
-    return { row, column };
+    return { row: row - 1, column: column - 1 }; // Adjusting column by subtracting 1 for 0-based indexing
   }
+  
+  
 
   private getReferencingCells(cell: Cell): Cell[] {
     const referencingCells: Cell[] = [];

@@ -49,7 +49,7 @@ describe("should evaluate basic arithmetic function", () => {
     expect(cell2.getDisplayedValue()).toBe('60');
   });
   
-  it("Should evaluate correctly if a reference is changed after", () => {
+  it("Should evaluate correctly if a reference is changed after with set", () => {
     
     const s = new SpreadSheet("s1", "0", [],5,5);
     const expression = "+A1 + B2";   
@@ -62,7 +62,7 @@ describe("should evaluate basic arithmetic function", () => {
     expect(s.getCell(2,2).getDisplayedValue()).toBe('140');
 
   });
-  
+
   it("should evaluate expressions with MIN", () => {
     const s = new SpreadSheet("s1", "0", [],5,5);
     const expression = "+MIN(2,3,5,1,-4)";
@@ -102,6 +102,39 @@ describe("should evaluate basic arithmetic function", () => {
     const cell = s.addCell(0,0,expression);
     expect(cell.getRawValue()).toBe(expression);
     expect(cell.getDisplayedValue()).toBe('7');
+    expect(cell.checkError()).toBe(false);
+  });
+
+  it("should evaluate expressions with SUM and cell refs", () => {
+    const s = new SpreadSheet("s1", "0", [],5,5);
+    const expression = "+SUM(A1,B1,A2,B2)";
+
+    s.addCell(0,0,'2');
+    s.addCell(0,1,'4');
+    s.addCell(1,0,'6');
+    s.addCell(1,1,'8');
+
+    s.setCellValue(s.getCell(3,3), expression);
+
+    const cell = s.getCell(3,3);
+    expect(cell.getRawValue()).toBe(expression);
+    expect(cell.getDisplayedValue()).toBe('20');
+    expect(cell.checkError()).toBe(false); 
+  });
+
+  it("should evaluate expressions with SUM and cell refs alt", () => {
+    const s = new SpreadSheet("sheet1", "0", [],5,5);
+    const expression = "+SUM(B1,C1)";
+
+    s.addCell(0,1,'2');
+    s.addCell(0,2,'8');
+
+    s.setCellValue(s.getCell(4,4), expression);
+
+    const cell = s.getCell(4,4);
+    expect(cell.getRawValue()).toBe(expression);
+    expect(cell.getDisplayedValue()).toBe('10');
+    expect(cell.checkError()).toBe(false); 
   });
 
   //...
@@ -323,4 +356,23 @@ describe("should return raw value and toggle error flg if invalid", () => {
     });
  
 
+});
+
+
+describe("change back to priv", () => {
+  it("should throw error flag for function type errors", () => {
+    const s = new SpreadSheet("s1", "0", [], 5, 5);
+    const {row,column} = s.decodeExcelCell('A2');
+    expect(row).toBe(1);
+    expect(column).toBe(0);
+  });
+
+  it("should  error flag for function type errors", () => {
+    const s = new SpreadSheet("s1", "0", [], 5, 5);
+    const {row,column} = s.decodeExcelCell('C4');
+    expect(row).toBe(1);
+    expect(column).toBe(0);
+  });
+
+  
 });
