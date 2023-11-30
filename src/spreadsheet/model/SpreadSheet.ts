@@ -53,7 +53,7 @@ export class SpreadSheet {
     const [str, refList, err] = this.evaluateCell(cell.getRawValue(), this.getCellAddress(cell))
     cell.setDisplayValue(str);
     if (err) cell.flagError();
-
+    else cell.unflagError();
     const refCells = this.getCellsFromAddresses(refList);
     for (const ref of refCells){
       const [updated] = this.evaluateCell(ref.getRawValue(), this.getCellAddress(ref))
@@ -66,6 +66,7 @@ export class SpreadSheet {
     const [str, refList, err] = this.evaluateCell(expression,this.getCellAddress(this.getCell(row,col)));
     this.cells[row][col] = new Cell(expression, str);
     if (err) this.cells[row][col].flagError();
+    else this.cells[row][col].unflagError();
     return this.cells[row][col];
   }
 
@@ -141,21 +142,17 @@ export class SpreadSheet {
   
   // Returns a map of each cell address to its displayed value. ex: { 'A6': 2, 'R3': 5}
   getCellTOValue(): Record<string, number | string> {
-    const values: Record<string, number> = {};
+    const values: Record<string, number | string> = {};
     for (let i = 0; i < this.cells.length; i++) {
       const row = this.cells[i];
       for (let j = 0; j < row.length; j++) {
-        values[this.getCellAddress(row[j])] = Number(
-          row[j].getDisplayedValue()
-        );
+        values[this.getCellAddress(row[j])] = row[j].getDisplayedValue();
       }
     }
     return values;
     
   }
  
-
-
   private getCellsFromAddresses(refList: string[]): Cell[] {
     const cells: Cell[] = [];
   
@@ -184,7 +181,7 @@ export class SpreadSheet {
     }
   
     // Get the cell at the specified coordinates
-    return this.getCell(row - 1, column - 1); // Adjusting 1-based indexing to 0-based indexing
+    return this.getCell(row - 1, column - 1); //` Adjusting 1-based indexing to 0-based indexing
   
   }
 

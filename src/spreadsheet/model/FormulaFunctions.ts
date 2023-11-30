@@ -25,14 +25,12 @@ export function EvaluateExpression(
     }
   }
   
-  
+
   // Replace variables with their values
   expression = expression.replace(/[A-Za-z]\w*/g, (match) => {
     const variableValue = variables[match];
     return variableValue !== undefined ? variableValue.toString() : match;
   });
-
-  //return [expression, refList, true];
   
   try {
     // Attempt to evaluate the expression
