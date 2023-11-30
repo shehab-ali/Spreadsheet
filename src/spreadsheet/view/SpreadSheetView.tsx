@@ -417,18 +417,18 @@ export const SpreadsheetView = () => {
                 <input
                   type="text"
                   className={`form-control rounded-0 ${
-                    j - 1 === highlightedCell["row"] &&
-                    i - 1 === highlightedCell["col"]
+                    i - 1 === highlightedCell["row"] &&
+                    j - 1 === highlightedCell["col"]
                       ? "highlighted-cell"
                       : ""
                   }`}
                   style={{ width: "98px" }}
                   onDoubleClick={(event) =>
-                    handleDoubleClick(event, j - 1, i - 1)
+                    handleDoubleClick(event, i - 1, j - 1)
                   }
                   onBlur={() => {
-                    const rowIdx = j - 1
-                    const colIdx = i - 1
+                    const rowIdx = i - 1
+                    const colIdx = j - 1
                     const modelCell = spreadsheet.getCell(rowIdx, colIdx)
 
                     setCells((prevCells: string[][]) => {
@@ -449,10 +449,10 @@ export const SpreadsheetView = () => {
                       );
                     });
                   }}
-                  value={cells[j - 1][i - 1]}
-                  onChange={(event) => handleChangeCell(event, j - 1, i - 1)}
-                  onClick={(event) => handleClick(event, j - 1, i - 1)}
-                  onContextMenu={(event) => handleRightClick(event, j - 1, i - 1)}
+                  value={cells[i - 1][j - 1]}
+                  onChange={(event) => handleChangeCell(event, i - 1, j - 1)}
+                  onClick={(event) => handleClick(event, i - 1, j - 1)}
+                  onContextMenu={(event) => handleRightClick(event, i - 1, j - 1)}
                 ></input>
               )}
             </div>

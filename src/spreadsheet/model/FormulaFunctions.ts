@@ -13,18 +13,17 @@ export function EvaluateExpression(
   expression = expression.replace(/COUNT/g, "count");
   expression = expression.replace(/SUM/g, "sum");
   expression = expression.replace(
-    /CONCAT\((.+?)\)/g,
-    (_, args) => `concat(${args})`
+    /CONCAT\((.+?)\)/gi,
+    (_, args) => `concat(${args.replace(/CONCAT/gi, 'concat')})`
   );
-  
-   const refList: string[] = [];
-   // Iterate through variables and check if their value contains the address
-   for (const [key, value] of Object.entries(variables)) {
+   
+  const refList: string[] = [];
+  // Iterate through variables and check if their value contains the address
+  for (const [key, value] of Object.entries(variables)) {
     if (typeof value === 'string' && value.includes(address)) {
       refList.push(key); // Add the variable key to refList if value contains the address
     }
   }
-  
 
   // Replace variables with their values
   expression = expression.replace(/[A-Za-z]\w*/g, (match) => {
@@ -32,19 +31,36 @@ export function EvaluateExpression(
     return variableValue !== undefined ? variableValue.toString() : match;
   });
   
+  const concatRegex = /concat\(([^)]+)\)/gi;
+
+  let match;
+  let concatOccurred = false; // Variable to track if concat occurred
+  while ((match = concatRegex.exec(expression)) !== null) {
+    const args = match[1];
+    const concatResult = concat(...args.split(',').map((arg: string) => arg.trim()));
+    expression = expression.replace(match[0], `${concatResult}`);
+    concatOccurred = true; // Update flag if concat occurred
+  }
+
   try {
     // Attempt to evaluate the expression
     const result = eval(expression);
-
-    //if (result.includes('NaN')) return [expression, refList, true];
     return [String(result), refList, false];
 
   } catch (error) {
-    // If an error occurs during evaluation, return the original expression and throw flag
+    if (concatOccurred) {
+      // If catching string 
+      // If an error occurs during evaluation, return the original expression and throw flag
+      return [expression, refList, false];
+    } else {
+      // Re-throw other types of errors
+      // If an error occurs during evaluation, return the original expression and throw flag
     return [expression, refList, true];
+    }
+
+    
+    
   }
-  
-   
 }
 
 function average(...numbers: number[]): number {
@@ -61,10 +77,5 @@ function sum(...numbers: number[]): number {
 }
 
 function concat(...values: any[]): string {
-  return values.join("");
+  return values.flat().map(value => String(value)).join("");
 }
-
-// Example on how it would be used
-// const exampleString = 'MIN(A6, X7, 3, AVERAGE(2, 4), 1 + 2, 3 * 2, 5 / 7, COUNT(1, 2, 3), SUM(2, 4, 6))';
-// const variables = { A6: 10, X7: 5 }; // in the future, we want to use {A6: getDisplayedValue(A6)}
-// const result = evaluateExpression(exampleString, variables);

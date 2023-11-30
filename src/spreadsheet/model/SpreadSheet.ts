@@ -43,24 +43,46 @@ export class SpreadSheet {
   }
 
   //returns list of changed cells 
-  setCellValue(cell :Cell, value :string): Cell[]{
+  setCellValue(cell: Cell, value: string): Cell[] {
+    const updatedCells: Cell[] = [];
+    const prevRawValue = cell.getRawValue(); // Store previous raw value
+    
     cell.setRawValue(value);
-    return this.updateDisplayedValue(cell);
+    updatedCells.push(...this.updateDisplayedValue(cell)); // Update the modified cell
+    
+    // Check if the raw value has changed; if so, update referencing cells
+    if (prevRawValue !== value) {
+      const refCells = this.getReferencingCells(cell); // Get cells referencing the modified cell
+      for (const ref of refCells) {
+        updatedCells.push(...this.updateDisplayedValue(ref)); // Update referencing cells
+      }
+    }
+    
+    return updatedCells;
   }
-
-  //returns list of changed cells
-  private updateDisplayedValue(cell :Cell): Cell[]{
-    const [str, refList, err] = this.evaluateCell(cell.getRawValue(), this.getCellAddress(cell))
+  
+  private updateDisplayedValue(cell: Cell): Cell[] {
+    const [str, refList, err] = this.evaluateCell(
+      cell.getRawValue(),
+      this.getCellAddress(cell)
+    );
     cell.setDisplayValue(str);
     if (err) cell.flagError();
     else cell.unflagError();
+  
     const refCells = this.getCellsFromAddresses(refList);
-    for (const ref of refCells){
-      const [updated] = this.evaluateCell(ref.getRawValue(), this.getCellAddress(ref))
+    for (const ref of refCells) {
+      const [updated] = this.evaluateCell(
+        ref.getRawValue(),
+        this.getCellAddress(ref)
+      );
       ref.setDisplayValue(updated);
     }
-    return refCells;
+  
+    return refCells; // Return referencing cells for further updates
   }
+  
+
 
   addCell(row: number, col: number, expression :string): Cell {
     const [str, refList, err] = this.evaluateCell(expression,this.getCellAddress(this.getCell(row,col)));
@@ -72,6 +94,7 @@ export class SpreadSheet {
 
   evaluateCell(expression :string, addr :string): [string, string[], boolean]{
     if (expression.trim().charAt(0) === '+') {
+      expression = expression.replace(/^\+/, '');
       return EvaluateExpression(expression, this.getCellTOValue(), addr);
     }
     return [expression, [], false];
@@ -209,6 +232,23 @@ export class SpreadSheet {
   
     return { row, column };
   }
+
+  private getReferencingCells(cell: Cell): Cell[] {
+    const referencingCells: Cell[] = [];
+  
+    for (let i = 0; i < this.cells.length; i++) {
+      const row = this.cells[i];
+      for (let j = 0; j < row.length; j++) {
+        const currentCell = row[j];
+        if (currentCell.getRawValue().includes(this.getCellAddress(cell))) {
+          referencingCells.push(currentCell);
+        }
+      }
+    }
+  
+    return referencingCells;
+  }
+  
  
 }
 
