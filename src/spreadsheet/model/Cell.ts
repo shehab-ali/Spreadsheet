@@ -7,7 +7,6 @@ export class Cell {
   constructor(rawValue: string = "", displayValue: string = "") {
     this.rawValue = rawValue;
     this.displayValue = displayValue;
-    
   }
 
   // Set the value of the cell, which is a formula or a raw value
@@ -22,7 +21,6 @@ export class Cell {
   // Get the displayed value (could be a formula result or the raw value)
   getDisplayedValue(): string {
     // if formula exists within value, evaluate and return it
-
     return this.displayValue;
   }
 
