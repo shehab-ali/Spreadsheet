@@ -35,9 +35,17 @@ export function EvaluateExpression(
   });
   
   // Evaluate the expression
-  const result = eval(expression);
-
-  return [String(result), refList];
+  
+  try {
+    // Attempt to evaluate the expression
+    const result = eval(expression);
+    return [String(result), refList];
+  } catch (error) {
+    // If an error occurs during evaluation, return the original expression
+    return [expression, refList];
+  }
+  
+  
 }
 
 function average(...numbers: number[]): number {
