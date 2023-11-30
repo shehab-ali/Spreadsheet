@@ -31,6 +31,4 @@ export class Cell {
     return this.rawValue;
   }
 
-
-
  }
