@@ -34,10 +34,12 @@ export function EvaluateExpression(
   const concatRegex = /concat\(([^)]+)\)/gi;
 
   let match;
+  let concatOccurred = false; // Variable to track if concat occurred
   while ((match = concatRegex.exec(expression)) !== null) {
     const args = match[1];
     const concatResult = concat(...args.split(',').map((arg: string) => arg.trim()));
     expression = expression.replace(match[0], `${concatResult}`);
+    concatOccurred = true; // Update flag if concat occurred
   }
 
   try {
@@ -46,7 +48,7 @@ export function EvaluateExpression(
     return [String(result), refList, false];
 
   } catch (error) {
-    if (error instanceof ReferenceError) {
+    if (concatOccurred) {
       // If catching string 
       // If an error occurs during evaluation, return the original expression and throw flag
       return [expression, refList, false];

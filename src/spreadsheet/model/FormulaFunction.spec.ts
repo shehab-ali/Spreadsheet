@@ -265,4 +265,62 @@ describe("should return raw value and toggle error flg if invalid", () => {
     expect(cell.checkError()).toBe(false);
   });
 
+  it("should throw error flag and return raw with incorrect syntax", () => {
+    const s = new SpreadSheet("s1", "0", [], 5, 5);
+    const expression = "+SUM(2, 3, * 5, 1, -4)";
+    const cell = s.addCell(0, 0, expression);
+    expect(cell.getDisplayedValue()).toBe('sum(2, 3, * 5, 1, -4)');
+    expect(cell.checkError()).toBe(true);
+  });
+
+  it("should throw error flag and return raw with circular reference", () => {
+    const s = new SpreadSheet("s1", "0", [], 5, 5);
+    const expression = "+A1 + B1";
+    const cell = s.addCell(0, 0, expression);
+
+    expect(cell.getDisplayedValue()).toBe(' + ');
+    expect(cell.checkError()).toBe(true);
+  });
+
+    it("should throw error flag and return raw with invalid operator", () => {
+      const s = new SpreadSheet("s1", "0", [], 5, 5);
+      const expression = "+SUM(2, 3) ++ 5";
+      const cell = s.addCell(0, 0, expression);
+      expect(cell.getDisplayedValue()).toBe('sum(2, 3) ++ 5');
+      expect(cell.checkError()).toBe(true);
+    });
+  
+    it("should throw error flag and return raw with missing parentheses", () => {
+      const s = new SpreadSheet("s1", "0", [], 5, 5);
+      const expression = "+SUM(2, 3";
+      const cell = s.addCell(0, 0, expression);
+      expect(cell.getDisplayedValue()).toBe('sum(2, 3');
+      expect(cell.checkError()).toBe(true);
+    });
+  
+    it("should throw error flag and return raw with unrecognized function", () => {
+      const s = new SpreadSheet("s1", "0", [], 5, 5);
+      const expression = "+INVALIDFUNC(2, 3)";
+      const cell = s.addCell(0, 0, expression);
+      expect(cell.getDisplayedValue()).toBe('INVALIDFUNC(2, 3)');
+      expect(cell.checkError()).toBe(true);
+    });
+
+    it("should throw error flag for out-of-range reference", () => {
+      const s = new SpreadSheet("s1", "0", [], 2, 2);
+      const expression = "+C3 + D4"; // Out-of-range reference
+      const cell = s.addCell(0, 0, expression);
+      expect(cell.getDisplayedValue()).toBe('C3 + D4');
+      expect(cell.checkError()).toBe(true);
+    });
+
+    it("should throw error flag for function type errors", () => {
+      const s = new SpreadSheet("s1", "0", [], 5, 5);
+      const expression = "+COUNT(1, 2, abc)"; // Invalid argument
+      const cell = s.addCell(0, 0, expression);
+      expect(cell.getDisplayedValue()).toBe('count(1, 2, abc)');
+      expect(cell.checkError()).toBe(true);
+    });
+ 
+
 });
