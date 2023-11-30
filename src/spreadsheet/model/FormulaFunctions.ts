@@ -1,8 +1,9 @@
 import { Cell } from "./Cell";
+import { SpreadSheet } from "./SpreadSheet";
+
 export function EvaluateExpression(
   expression: string,
   variables: Record<string, number | string>,
-  cells: Cell[][]
 ): string {
   // Replace function names with their JavaScript counterparts
   expression = expression.replace(/MIN/g, "Math.min");
@@ -15,19 +16,10 @@ export function EvaluateExpression(
     (_, args) => `concat(${args})`
   );
   
-  for (let i = 0; i < cells.length; i++) {
-    for (let j = 0; j < cells[i].length; j++) {
-      const cell = cells[i][j];
-      const addr = String.fromCharCode('A'.charCodeAt(0) + i) + (j + 1);
-      variables[addr] = cell.getDisplayedValue();
-     // if (!cell.checkCellReference()){
-     //   throw new Error("This is a cyclical reference.");
-     // }
-    }
-  }
-  
+
   // Replace variables with their values
   expression = expression.replace(/[A-Za-z]\w*/g, (match) => {
+    //const variables: Record<string, number | string> = 
     const variableValue = variables[match];
     return variableValue !== undefined ? variableValue.toString() : match;
   });
