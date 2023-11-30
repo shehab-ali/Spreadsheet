@@ -76,6 +76,7 @@ export const SpreadsheetView = () => {
         const res = setCellsFromDb(spreadsheet)
         const model = res[0]
         const stateCells = res[1]
+        console.log(stateCells)
         
         setSpreadsheet(model)
         setCells(stateCells)
@@ -367,7 +368,6 @@ export const SpreadsheetView = () => {
   const handleRightClick = (event: React.MouseEvent<HTMLInputElement, MouseEvent>, row: number, col: number) => {
     event.preventDefault(); // This line prevents the default context menu from showing
     (event.target as HTMLInputElement).blur();
-    console.log(event)
 
     setShowModal(true); // Show the modal
     setModalPosition({ // Set the position of the modal
@@ -452,7 +452,7 @@ export const SpreadsheetView = () => {
                   value={cells[i - 1][j - 1]}
                   onChange={(event) => handleChangeCell(event, i - 1, j - 1)}
                   onClick={(event) => handleClick(event, i - 1, j - 1)}
-                  onContextMenu={(event) => handleRightClick(event, i - 1, j - 1)}
+                  onContextMenu={(event) => handleRightClick(event, j - 1, i - 1)}
                 ></input>
               )}
             </div>
@@ -482,11 +482,41 @@ export const SpreadsheetView = () => {
     return <FaSave className={iconClass} />;
   };
 
+  const modalToString = () => {
+    if (spreadsheet) {
+      return spreadsheet.cells.map(row => row.map(cell => cell.getRawValue()))
+    }
+  }
+
   const deleteRow = () => {
+    // delete row in modal
+    // get list of list of string representation of cells from modal
+    // reset Cells state
+    // 
   }
 
   const deleteColumn = () => {
+    console.log(modalPosition.col)
+    if (spreadsheet) {
+      // if (isChanging) {
+      //   resetTimer();
+      //   startTimer();
+      // } else {
+      //   startTimer();
+      // }
+      const copy: string[][] = cells.map((innerArray, i) => [...innerArray]);
+      const setCopy = copy.filter((row, i) => i > 0)
 
+      spreadsheet.deleteRow(0)
+      console.log(spreadsheet.rows)
+      console.log(spreadsheet.cols)
+
+      const cellsString = modalToString()
+
+      if (cellsString) {
+        //setCells(setCopy)
+      }
+    }
   }
 
   const insertRow = () => {
