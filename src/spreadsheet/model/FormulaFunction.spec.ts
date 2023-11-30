@@ -88,6 +88,22 @@ describe("should evaluate basic arithmetic function", () => {
     expect(cell.getDisplayedValue()).toBe('1.4');
   });
 
+  it("should evaluate expressions with COUNT", () => {
+    const s = new SpreadSheet("s1", "0", [],5,5);
+    const expression = "+COUNT(2,3,5,1,-4)";
+    const cell = s.addCell(0,0,expression);
+    expect(cell.getRawValue()).toBe(expression);
+    expect(cell.getDisplayedValue()).toBe('5');
+  });
+
+  it("should evaluate expressions with SUM", () => {
+    const s = new SpreadSheet("s1", "0", [],5,5);
+    const expression = "+SUM(2,3,5,1,-4)";
+    const cell = s.addCell(0,0,expression);
+    expect(cell.getRawValue()).toBe(expression);
+    expect(cell.getDisplayedValue()).toBe('7');
+  });
+
   //...
 
 });  
@@ -232,11 +248,11 @@ describe("should return raw value and toggle error flg if invalid", () => {
     const s = new SpreadSheet("s1", "0", [],5,5);
     const expression = "+AVERAGE(2,3,5,1,-4) - ";
     const cell = s.addCell(0,0,expression);
-    expect(cell.getDisplayedValue()).toBe('+average(2,3,5,1,-4) - ');
+    expect(cell.getDisplayedValue()).toBe('average(2,3,5,1,-4) - ');
     expect(cell.checkError()).toBe(true);
   });
 
-  it("Should evaluate correctly with nested cell references", () => {
+  it("Should evaluate correctly with CONCAT", () => {
     
     const s = new SpreadSheet("s1", "0", [],5,5);
     const expression = "+CONCAT(A1,B1)";   
@@ -245,11 +261,8 @@ describe("should return raw value and toggle error flg if invalid", () => {
     s.addCell(0,1,'Cat');
     const cell = s.addCell(2,2, expression);
  
-    expect(cell.getDisplayedValue()).toBe('6');
-    //expect(cell1.checkError()).toBe(false);
+    expect(cell.getDisplayedValue()).toBe('AppCat');
+    expect(cell.checkError()).toBe(false);
   });
-
-
-
 
 });

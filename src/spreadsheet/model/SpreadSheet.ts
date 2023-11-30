@@ -68,6 +68,7 @@ export class SpreadSheet {
 
   evaluateCell(expression :string, addr :string): [string, string[], boolean]{
     if (expression.trim().charAt(0) === '+') {
+      expression = expression.replace(/^\+/, '');
       return EvaluateExpression(expression, this.getCellTOValue(), addr);
     }
     return [expression, [], false];
