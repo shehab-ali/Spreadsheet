@@ -2,11 +2,13 @@ import { SpreadSheet } from "./SpreadSheet";
 import { EvaluateExpression } from "./FormulaFunctions";
 export class Cell {
    private rawValue: string;
-  private displayValue: string;
+   private displayValue: string;
+   private error: boolean;
 
   constructor(rawValue: string = "", displayValue: string = "") {
     this.rawValue = rawValue;
     this.displayValue = displayValue;
+    this.error = false;
   }
 
   // Set the value of the cell, which is a formula or a raw value
@@ -29,4 +31,13 @@ export class Cell {
     return this.rawValue;
   }
 
- }
+  flagError(): void {
+    this.error = true;
+  }
+
+  // returns true if there IS an error or false if not
+  checkError() :boolean{
+    return this.error;
+  }
+
+}
