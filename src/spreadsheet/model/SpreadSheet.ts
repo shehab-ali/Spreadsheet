@@ -1,5 +1,4 @@
 import { Cell } from "./Cell";
-import { User } from "./User";
 import { EvaluateExpression } from "./FormulaFunctions";
 
 //import { DecodeExcelCell } from "./FormulaFunctions";
@@ -44,7 +43,7 @@ export class SpreadSheet {
     this.updateDisplayedValue(cell);
   }
 
-  updateDisplayedValue(cell :Cell){
+  private updateDisplayedValue(cell :Cell){
     cell.setDisplayValue(this.evaluateCell(cell.getRawValue()));
 
   }
@@ -55,7 +54,11 @@ export class SpreadSheet {
   }
 
   evaluateCell(expression :string): string{
-    return EvaluateExpression(expression, this.getCellTOValue());
+    if (expression.trim().charAt(0) === '+') {
+      return EvaluateExpression(expression, this.getCellTOValue());
+    }
+    return expression;
+
   }
 
   // Get the cell's address in A1 notation (e.g., "A1", "B2")
