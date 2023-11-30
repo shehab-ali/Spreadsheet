@@ -144,12 +144,16 @@ describe("should evaluate basic arithmetic function", () => {
 describe('Tests for row and column manipulations', () => {
   it('should insert a row at the beginning of the spreadsheet', () => {
     const s = new SpreadSheet('s1', '0', [], 5, 5);
-    const initialRows = s.getNumRows();
+    const initialRows = s.rows;
     s.addCell(0,2,'8');
 
     s.insertRow(0);
 
-    expect(s.getNumRows()).toBe(initialRows + 1);
+    expect(s.rows).toBe(initialRows + 1);
+
+
+
+
     // Assuming default cell values are empty strings
     for (let i = 0; i < s.getNumCols(); i++) {
       expect(s.getCell(0, i).getDisplayedValue()).toBe('');
@@ -356,23 +360,4 @@ describe("should return raw value and toggle error flg if invalid", () => {
     });
  
 
-});
-
-
-describe("change back to priv", () => {
-  it("should throw error flag for function type errors", () => {
-    const s = new SpreadSheet("s1", "0", [], 5, 5);
-    const {row,column} = s.decodeExcelCell('A2');
-    expect(row).toBe(1);
-    expect(column).toBe(0);
-  });
-
-  it("should  error flag for function type errors", () => {
-    const s = new SpreadSheet("s1", "0", [], 5, 5);
-    const {row,column} = s.decodeExcelCell('C4');
-    expect(row).toBe(1);
-    expect(column).toBe(0);
-  });
-
-  
 });

@@ -43,7 +43,7 @@ export class SpreadSheet {
   }
 
   //returns list of changed cells 
-  setCellValue(cell: Cell, value: string): Cell[] {
+  setCellValue(cell: Cell, value: string):  [number, number][]  {
     const updatedCells: Cell[] = [];
     const prevRawValue = cell.getRawValue(); // Store previous raw value
     
@@ -58,7 +58,7 @@ export class SpreadSheet {
       }
     }
     
-    return updatedCells;
+    return this.getRowColumnList(updatedCells);
   }
   
   private updateDisplayedValue(cell: Cell): Cell[] {
@@ -212,7 +212,7 @@ export class SpreadSheet {
   
   }
 
-  decodeExcelCell(cellReference: string): { row: number; column: number } {
+  private decodeExcelCell(cellReference: string): { row: number; column: number } {
     const regex = /([A-Z]+)(\d+)/;
     const match = cellReference.match(regex);
   
@@ -252,8 +252,19 @@ export class SpreadSheet {
   
     return referencingCells;
   }
+
+  private getRowColumnList(cells: Cell[]): [number, number][] {
+    const rowColumnList: [number, number][] = [];
+
+    for (const cell of cells) {
+      const row = this.cells.findIndex((row) => row.includes(cell));
+      const col = this.cells[row].indexOf(cell);
+      rowColumnList.push([row, col]);
+    }
+
+    return rowColumnList;
+  }
   
- 
 }
 
 
