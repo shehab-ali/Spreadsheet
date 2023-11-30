@@ -44,8 +44,7 @@ export function EvaluateExpression(
     // If an error occurs during evaluation, return the original expression
     return [expression, refList];
   }
-  
-  
+   
 }
 
 function average(...numbers: number[]): number {
