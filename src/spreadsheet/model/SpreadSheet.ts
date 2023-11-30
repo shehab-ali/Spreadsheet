@@ -117,6 +117,7 @@ export class SpreadSheet {
   deleteRow(rowNumber: number): void {
     if (rowNumber >= 0 && rowNumber < this.cells.length) {
       this.cells.splice(rowNumber, 1);
+      this.rows --;
     }
   }
 
@@ -125,6 +126,7 @@ export class SpreadSheet {
     if (colNumber >= 0 && colNumber < this.cells[0].length) {
       for (let row = 0; row < this.cells.length; row++) {
         this.cells[row].splice(colNumber, 1);
+        this.cols --;
       }
     }
   }
@@ -137,6 +139,7 @@ export class SpreadSheet {
         newRow[i] = new Cell("");
       }
       this.cells.splice(rowNumber, 0, newRow);
+      this.rows ++;
     }
   }
 
@@ -146,6 +149,7 @@ export class SpreadSheet {
       for (let row = 0; row < this.cells.length; row++) {
         const newCell = new Cell("");
         this.cells[row].splice(colNumber, 0, newCell);
+        this.cols ++;
       }
     }
   }
