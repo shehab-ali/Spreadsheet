@@ -35,6 +35,11 @@ export class Cell {
     this.error = true;
   }
 
+  unflagError(): void {
+    this.error = false;
+  }
+
+
   // returns true if there IS an error or false if not
   checkError() :boolean{
     return this.error;
