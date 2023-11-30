@@ -217,3 +217,36 @@ describe('Tests for row and column manipulations', () => {
   });
 
 });
+
+describe("should return raw value and toggle error flg if invalid", () => {
+  
+  it("should not throw error flag with valid exp", () => {
+    const s = new SpreadSheet("s1", "0", [],5,5);
+    const expression = "+AVERAGE(2,3,5,1,-4) - SUM(3,2) * COUNT(1,2,3,4) / MIN(MAX(1,1,1))";
+    const cell = s.addCell(0,0,expression);
+    expect(cell.getDisplayedValue()).toBe('-18.6');
+    expect(cell.checkError()).toBe(false);
+  });
+
+  it("should throw error flag and return raw with invalid expression", () => {
+    const s = new SpreadSheet("s1", "0", [],5,5);
+    const expression = "+AVERAGE(2,3,5,1,-4) - ";
+    const cell = s.addCell(0,0,expression);
+    expect(cell.getDisplayedValue()).toBe('+average(2,3,5,1,-4) - ');
+    expect(cell.checkError()).toBe(true);
+  });
+
+  it("Should evaluate correctly with nested cell references", () => {
+    
+    const s = new SpreadSheet("s1", "0", [],5,5);
+    const expression = "+CONCAT(A1,B1)";   
+
+    s.addCell(0,0,'App');
+    s.addCell(0,1,'Bob');
+    const cell = s.addCell(2,2, expression);
+ 
+    expect(cell.getDisplayedValue()).toBe('6');
+    //expect(cell1.checkError()).toBe(false);
+  });
+
+});
