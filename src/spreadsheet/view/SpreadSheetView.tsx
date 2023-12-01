@@ -686,17 +686,6 @@ export const SpreadsheetView = () => {
                 >
                   concat
                 </Dropdown.Item>
-                <Dropdown.Item
-                  onClick={() =>
-                    handleInsertFormula(
-                      "+RANGE()",
-                      highlightedCell.row,
-                      highlightedCell.col
-                    )
-                  }
-                >
-                  range
-                </Dropdown.Item>
               </DropdownButton>
               <input
                 type="text"
