@@ -126,8 +126,8 @@ export class SpreadSheet {
     if (colNumber >= 0 && colNumber < this.cells[0].length) {
       for (let row = 0; row < this.cells.length; row++) {
         this.cells[row].splice(colNumber, 1);
-        this.cols --;
       }
+      this.cols --;
     }
   }
 
@@ -136,7 +136,7 @@ export class SpreadSheet {
     if (rowNumber >= 0 && rowNumber <= this.cells.length) {
       const newRow = new Array(this.cells[0].length);
       for (let i = 0; i < newRow.length; i++) {
-        newRow[i] = new Cell("");
+        newRow[i] = new Cell("", "");
       }
       this.cells.splice(rowNumber, 0, newRow);
       this.rows ++;
@@ -147,10 +147,10 @@ export class SpreadSheet {
   insertCol(colNumber: number): void {
     if (colNumber >= 0 && colNumber <= this.cells[0].length) {
       for (let row = 0; row < this.cells.length; row++) {
-        const newCell = new Cell("");
+        const newCell = new Cell("", "");
         this.cells[row].splice(colNumber, 0, newCell);
-        this.cols ++;
       }
+      this.cols ++;
     }
   }
 

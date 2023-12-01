@@ -153,7 +153,6 @@ describe('Tests for row and column manipulations', () => {
 
 
 
-
     // Assuming default cell values are empty strings
     for (let i = 0; i < s.getNumCols(); i++) {
       expect(s.getCell(0, i).getDisplayedValue()).toBe('');
