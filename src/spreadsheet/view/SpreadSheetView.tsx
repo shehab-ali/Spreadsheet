@@ -467,7 +467,7 @@ export const SpreadsheetView = () => {
             <div
               key={i}
               className="row"
-              style={{ display: "flex"}}
+              style={{ display: "flex", flexFlow: "row nowrap", minWidth: 0}}
             >
               {row}
             </div>
@@ -584,10 +584,10 @@ export const SpreadsheetView = () => {
                 backgroundColor: 'white'
               }}
             >
-              <div onClick={deleteRow}>Delete Row</div>
-              <div onClick={deleteColumn}>Delete Column</div>
-              <div onClick={insertRow}>Insert Row</div>
-              <div onClick={insertColumn}>Insert Column</div>
+              <div onClick={deleteRow}>Delete Column</div>
+              <div onClick={deleteColumn}>Delete Row</div>
+              <div onClick={insertRow}>Insert Column</div>
+              <div onClick={insertColumn}>Insert Row</div>
             </div>
           )}
           <div className="bg-light py-5 mb-5 spreadsheet-header row-container">
@@ -596,8 +596,8 @@ export const SpreadsheetView = () => {
               onClick={() => navigate(-1)}
             />
           </div>
-          <div className="scrollable-container">
-            <div style={{ display: "flex" }}>
+          <div className="scrollable-container m-5">
+            <div style={{ display: "flex"}}>
               <Button
                 className="bg-success"
                 style={{ height: "38px", border: "none" }}
@@ -656,6 +656,17 @@ export const SpreadsheetView = () => {
                 <Dropdown.Item
                   onClick={() =>
                     handleInsertFormula(
+                      "+RANGE()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  range
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
                       "+MAX()",
                       highlightedCell.row,
                       highlightedCell.col
@@ -690,7 +701,7 @@ export const SpreadsheetView = () => {
                 }
               ></input>
             </div>
-            <div>
+            <div className="container">
               {generateGrid()}
             </div>
           </div>
