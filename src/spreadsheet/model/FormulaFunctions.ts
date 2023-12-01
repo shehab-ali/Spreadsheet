@@ -16,6 +16,14 @@ export function EvaluateExpression(
     /CONCAT\((.+?)\)/gi,
     (_, args) => `concat(${args.replace(/CONCAT/gi, 'concat')})`
   );
+
+  expression = expression.replace(
+    /RANGE\(([^,]+),\s*([^)]+)\)/g,
+    (_, start, end) => {
+      const range = getCellRange(start, end);
+      return `sum(${range.join(",")})`;
+    }
+  );
    
   const refList: string[] = [];
   // Iterate through variables and check if their value contains the address
@@ -78,4 +86,23 @@ function sum(...numbers: number[]): number {
 
 function concat(...values: any[]): string {
   return values.flat().map(value => String(value)).join("");
+}
+
+function getCellRange(startCell: string, endCell: string): string[] {
+  const startColumn = startCell.charAt(0);
+  const startRow = parseInt(startCell.slice(1));
+
+  const endColumn = endCell.charAt(0);
+  const endRow = parseInt(endCell.slice(1));
+
+  const range: string[] = [];
+
+  for (let row = startRow; row <= endRow; row++) {
+      for (let colCharCode = startColumn.charCodeAt(0); colCharCode <= endColumn.charCodeAt(0); colCharCode++) {
+          const col = String.fromCharCode(colCharCode);
+          range.push(`${col}${row}`);
+      }
+  }
+
+  return range;
 }

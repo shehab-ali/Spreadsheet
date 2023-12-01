@@ -49,6 +49,7 @@ export const SpreadsheetView = () => {
     for (let row = 0; row < cellObjs.length; row++) {
       let stateCellRow = []
       for (let col = 0; col < cellObjs[row].length; col++) {
+        console.log(cellObjs[row][col])
         model.addCell(row, col, cellObjs[row][col])
         const modelCell = model.getCell(row, col)
         if (modelCell.checkError()) {
@@ -394,7 +395,7 @@ export const SpreadsheetView = () => {
   const generateGrid = () => {
     if (spreadsheet) {
       const grid = [];
-
+  
       for (let i = 0; i < spreadsheet.rows + 1; i++) {
         const row = [];
         for (let j = 0; j < spreadsheet.cols + 1; j++) {
@@ -405,7 +406,7 @@ export const SpreadsheetView = () => {
                 j === 0 || i === 0 ? "cell-bold" : "cell"
               } input-group-text rounded-0`}
             >
-              {j == 0 && i == 0 ? (
+              {j === 0 && i === 0 ? (
                 ""
               ) : i === 0 ? (
                 j
@@ -417,8 +418,7 @@ export const SpreadsheetView = () => {
                 <input
                   type="text"
                   className={`form-control rounded-0 ${
-                    i - 1 === highlightedCell["row"] &&
-                    j - 1 === highlightedCell["col"]
+                    i - 1 === highlightedCell.row && j - 1 === highlightedCell.col
                       ? "highlighted-cell"
                       : ""
                   }`}
@@ -427,20 +427,20 @@ export const SpreadsheetView = () => {
                     handleDoubleClick(event, i - 1, j - 1)
                   }
                   onBlur={() => {
-                    const rowIdx = i - 1
-                    const colIdx = j - 1
-                    const modelCell = spreadsheet.getCell(rowIdx, colIdx)
-
+                    const rowIdx = i - 1;
+                    const colIdx = j - 1;
+                    const modelCell = spreadsheet.getCell(rowIdx, colIdx);
+  
                     setCells((prevCells: string[][]) => {
-                      return prevCells.map((row: string[], i) =>
-                        i === rowIdx
-                          ? row.map((cell: string, j) =>
-                              j === colIdx
+                      return prevCells.map((row: string[], k) =>
+                        k === rowIdx
+                          ? row.map((cell: string, l) =>
+                              l === colIdx
                                 ? (() => {
                                   if (modelCell.checkError()) {
-                                    return "#INVALID"
+                                    return "#INVALID";
                                   } else {
-                                    return modelCell.getDisplayedValue()
+                                    return modelCell.getDisplayedValue();
                                   }
                                 })()
                                 : cell
@@ -458,17 +458,22 @@ export const SpreadsheetView = () => {
             </div>
           );
         }
-        grid.push(
-          <div
-            key={i}
-            className="row"
-            style={{ gridTemplateRows: `repeat(${spreadsheet.rows + 1}, 40px)` }}
-          >
-            {row}
-          </div>
-        );
+        grid.push(row);
       }
-      return grid;
+  
+      return (
+        <div className="grid">
+          {grid.map((row, i) => (
+            <div
+              key={i}
+              className="row"
+              style={{ display: "flex"}}
+            >
+              {row}
+            </div>
+          ))}
+        </div>
+      );
     }
   };
 
@@ -535,13 +540,9 @@ export const SpreadsheetView = () => {
         startTimer();
       }
 
-      console.log(spreadsheet.rows)
-      console.log(spreadsheet.cols)
       spreadsheet.insertCol(modalPosition.row)
 
       const cellsString = modalToString()
-      console.log(spreadsheet.rows)
-      console.log(spreadsheet.cols)
 
       if (cellsString) {
         setCells(cellsString)
@@ -689,12 +690,7 @@ export const SpreadsheetView = () => {
                 }
               ></input>
             </div>
-            <div
-              className="grid"
-              style={{
-                gridTemplateColumns: `repeat(${spreadsheet.cols + 1}, 100px)`,
-              }}
-            >
+            <div>
               {generateGrid()}
             </div>
           </div>
