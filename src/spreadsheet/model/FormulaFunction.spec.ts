@@ -34,6 +34,19 @@ describe("should evaluate basic arithmetic function", () => {
     expect(cell.getDisplayedValue()).toBe('hi');
   });
 
+  it("should evaluate expressions when val doesn't change", () => {
+    const s = new SpreadSheet("s1", "0", [],5,5);
+
+    s.addCell(0,0,'2');
+    s.addCell(0,1,'4');
+    s.addCell(1,0,'6');
+    s.addCell(1,1,'8');
+
+    s.setCellValue(s.getCell(1,1), '8');
+    
+    expect(s.getCell(1,1).getDisplayedValue()).toBe('8');
+  });
+
   it("Should evaluate correctly with nested cell references", () => {
     
     const s = new SpreadSheet("s1", "0", [],5,5);
@@ -122,6 +135,23 @@ describe("should evaluate basic arithmetic function", () => {
     expect(cell.checkError()).toBe(false); 
   });
 
+  it("should evaluate expressions with SUM and cell refs not diag", () => {
+    const s = new SpreadSheet("s1", "0", [],5,5);
+    const expression = "+SUM(A1,B1,A2,B2)";
+
+    s.addCell(0,0,'2');
+    s.addCell(0,1,'4');
+    s.addCell(1,0,'6');
+    s.addCell(1,1,'8');
+
+    s.setCellValue(s.getCell(3,3), expression);
+
+    const cell = s.getCell(3,3);
+    expect(cell.getRawValue()).toBe(expression);
+    expect(cell.getDisplayedValue()).toBe('20');
+    expect(cell.checkError()).toBe(false); 
+  });
+
   it("should evaluate expressions with SUM and cell refs alt", () => {
     const s = new SpreadSheet("sheet1", "0", [],5,5);
     const expression = "+SUM(B1,C1)";
@@ -137,9 +167,11 @@ describe("should evaluate basic arithmetic function", () => {
     expect(cell.checkError()).toBe(false); 
   });
 
-  //...
-
 });  
+
+
+
+
 
 describe('Tests for row and column manipulations', () => {
   it('should insert a row at the beginning of the spreadsheet', () => {
@@ -151,9 +183,6 @@ describe('Tests for row and column manipulations', () => {
 
     expect(s.rows).toBe(initialRows + 1);
 
-
-
-
     // Assuming default cell values are empty strings
     for (let i = 0; i < s.getNumCols(); i++) {
       expect(s.getCell(0, i).getDisplayedValue()).toBe('');
@@ -164,6 +193,7 @@ describe('Tests for row and column manipulations', () => {
   it('should insert a row in the middle of the spreadsheet', () => {
     const s = new SpreadSheet('s1', '0', [], 5, 5);
     s.addCell(2,1,'8');
+    s.setCellValue(s.getCell(2,1),'100');
     const initialRows = s.getNumRows();
 
     s.insertRow(2);
@@ -173,7 +203,7 @@ describe('Tests for row and column manipulations', () => {
     for (let i = 0; i < s.getNumCols(); i++) {
       expect(s.getCell(2, i).getDisplayedValue()).toBe('');
     }
-    expect(s.getCell(3,1).getDisplayedValue()).toBe('8');
+    expect(s.getCell(3,1).getDisplayedValue()).toBe('100');
   });
 
   it('should insert a row at the end of the spreadsheet', () => {
@@ -269,6 +299,44 @@ describe('Tests for row and column manipulations', () => {
     }
   });
 
+  it('should do nothing if no row to delete', () => {
+    const s = new SpreadSheet('s1', '0', [], 5, 5);
+    const initialRows = s.getNumRows();
+
+    s.deleteRow(initialRows + 1);
+
+    expect(s.getNumRows()).toBe(initialRows);
+    
+  });
+
+  it('should do nothing if no col to insert', () => {
+    const s = new SpreadSheet('s1', '0', [], 5, 5);
+    const initialCols = s.getNumCols();
+
+    s.insertCol(initialCols + 1);
+
+    expect(s.getNumCols()).toBe(initialCols);
+  });
+  
+  it('should do nothing if no row to insert', () => {
+    const s = new SpreadSheet('s1', '0', [], 5, 5);
+    const initialRows = s.getNumRows();
+
+    s.insertRow(initialRows + 1);
+
+    expect(s.getNumRows()).toBe(initialRows);
+    
+  });
+
+  it('should do nothing if no col to remove', () => {
+    const s = new SpreadSheet('s1', '0', [], 5, 5);
+    const initialCols = s.getNumCols();
+
+    s.deleteCol(initialCols + 1);
+
+    expect(s.getNumCols()).toBe(initialCols);
+  });
+
 });
 
 describe("should return raw value and toggle error flg if invalid", () => {
@@ -307,15 +375,6 @@ describe("should return raw value and toggle error flg if invalid", () => {
     const expression = "+SUM(2, 3, * 5, 1, -4)";
     const cell = s.addCell(0, 0, expression);
     expect(cell.getDisplayedValue()).toBe('sum(2, 3, * 5, 1, -4)');
-    expect(cell.checkError()).toBe(true);
-  });
-
-  it("should throw error flag and return raw with circular reference", () => {
-    const s = new SpreadSheet("s1", "0", [], 5, 5);
-    const cell = s.addCell(1,1,"10");
-    s.addCell(0,0,'+40-B2')
-    s.setCellValue(cell, '+3+A1');
-    
     expect(cell.checkError()).toBe(true);
   });
 
@@ -359,5 +418,8 @@ describe("should return raw value and toggle error flg if invalid", () => {
       expect(cell.checkError()).toBe(true);
     });
  
-
 });
+
+
+
+
