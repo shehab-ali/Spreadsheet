@@ -656,6 +656,17 @@ export const SpreadsheetView = () => {
                 <Dropdown.Item
                   onClick={() =>
                     handleInsertFormula(
+                      "+RANGE()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  range
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
                       "+MAX()",
                       highlightedCell.row,
                       highlightedCell.col
