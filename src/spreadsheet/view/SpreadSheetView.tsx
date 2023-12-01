@@ -584,10 +584,10 @@ export const SpreadsheetView = () => {
                 backgroundColor: 'white'
               }}
             >
-              <div onClick={deleteRow}>Delete Row</div>
-              <div onClick={deleteColumn}>Delete Column</div>
-              <div onClick={insertRow}>Insert Row</div>
-              <div onClick={insertColumn}>Insert Column</div>
+              <div onClick={deleteRow}>Delete Column</div>
+              <div onClick={deleteColumn}>Delete Row</div>
+              <div onClick={insertRow}>Insert Column</div>
+              <div onClick={insertColumn}>Insert Row</div>
             </div>
           )}
           <div className="bg-light py-5 mb-5 spreadsheet-header row-container">
@@ -685,6 +685,17 @@ export const SpreadsheetView = () => {
                   }
                 >
                   concat
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() =>
+                    handleInsertFormula(
+                      "+RANGE()",
+                      highlightedCell.row,
+                      highlightedCell.col
+                    )
+                  }
+                >
+                  range
                 </Dropdown.Item>
               </DropdownButton>
               <input

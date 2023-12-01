@@ -21,7 +21,7 @@ export function EvaluateExpression(
     /RANGE\(([^,]+),\s*([^)]+)\)/g,
     (_, start, end) => {
       const range = getCellRange(start, end);
-      return `sum(${range.join(",")})`;
+      return `${range}`;
     }
   );
    
@@ -88,7 +88,7 @@ function concat(...values: any[]): string {
   return values.flat().map(value => String(value)).join("");
 }
 
-function getCellRange(startCell: string, endCell: string): string[] {
+function getCellRange(startCell: string, endCell: string): string {
   const startColumn = startCell.charAt(0);
   const startRow = parseInt(startCell.slice(1));
 
@@ -104,5 +104,5 @@ function getCellRange(startCell: string, endCell: string): string[] {
       }
   }
 
-  return range;
+  return range.toString();
 }
