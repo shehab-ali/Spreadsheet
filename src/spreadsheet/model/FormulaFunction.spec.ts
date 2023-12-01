@@ -183,11 +183,8 @@ describe('Tests for row and column manipulations', () => {
 
     expect(s.rows).toBe(initialRows + 1);
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> 75c9fe083513a29facdbb1900add47cfb2a1c556
     // Assuming default cell values are empty strings
     for (let i = 0; i < s.getNumCols(); i++) {
       expect(s.getCell(0, i).getDisplayedValue()).toBe('');
