@@ -49,6 +49,7 @@ export const SpreadsheetView = () => {
     for (let row = 0; row < cellObjs.length; row++) {
       let stateCellRow = []
       for (let col = 0; col < cellObjs[row].length; col++) {
+        console.log(cellObjs[row][col])
         model.addCell(row, col, cellObjs[row][col])
         const modelCell = model.getCell(row, col)
         if (modelCell.checkError()) {
@@ -535,13 +536,9 @@ export const SpreadsheetView = () => {
         startTimer();
       }
 
-      console.log(spreadsheet.rows)
-      console.log(spreadsheet.cols)
       spreadsheet.insertCol(modalPosition.row)
 
       const cellsString = modalToString()
-      console.log(spreadsheet.rows)
-      console.log(spreadsheet.cols)
 
       if (cellsString) {
         setCells(cellsString)
