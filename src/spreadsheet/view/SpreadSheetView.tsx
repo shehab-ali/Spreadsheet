@@ -409,11 +409,11 @@ export const SpreadsheetView = () => {
               {j == 0 && i == 0 ? (
                 ""
               ) : i === 0 ? (
-                j
-              ) : j === 0 ? (
-                String.fromCharCode("A".charCodeAt(0) + ((i - 1) % 26))
+                String.fromCharCode("A".charCodeAt(0) + ((j - 1) % 26))
                   .toString()
-                  .repeat((i - 1) / 26 + 1)
+                  .repeat((j - 1) / 26 + 1)
+              ) : j === 0 ? (
+                i
               ) : (
                 <input
                   type="text"
