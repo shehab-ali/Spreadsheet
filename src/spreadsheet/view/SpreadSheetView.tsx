@@ -467,7 +467,7 @@ export const SpreadsheetView = () => {
             <div
               key={i}
               className="row"
-              style={{ display: "flex"}}
+              style={{ display: "flex", flexFlow: "row nowrap", minWidth: 0}}
             >
               {row}
             </div>
@@ -596,8 +596,8 @@ export const SpreadsheetView = () => {
               onClick={() => navigate(-1)}
             />
           </div>
-          <div className="scrollable-container">
-            <div style={{ display: "flex" }}>
+          <div className="scrollable-container m-5">
+            <div style={{ display: "flex"}}>
               <Button
                 className="bg-success"
                 style={{ height: "38px", border: "none" }}
@@ -690,7 +690,7 @@ export const SpreadsheetView = () => {
                 }
               ></input>
             </div>
-            <div>
+            <div className="container">
               {generateGrid()}
             </div>
           </div>
